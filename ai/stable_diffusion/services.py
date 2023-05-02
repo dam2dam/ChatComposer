@@ -32,12 +32,23 @@ pipe.to("cuda")
 
 
 async def generate_image(imgPrompt: _schemas.ImageCreate) -> Image: 
-    generator = None if imgPrompt.seed is None else torch.Generator().manual_seed(int(imgPrompt.seed))
+    # generator = None if imgPrompt.seed is None else torch.Generator().manual_seed(int(imgPrompt.seed))
 
     image: Image = pipe(imgPrompt.prompt,
-                        guidance_scale=imgPrompt.guidance_scale, 
-                        num_inference_steps=imgPrompt.num_inference_steps, 
-                        generator = generator, 
+                        guidance_scale=8, 
+                        num_inference_steps=80, 
+                        # generator = generator, 
                     ).images[0]
     
     return image
+
+# async def generate_image(imgPrompt: _schemas.ImageCreate) -> Image: 
+#     generator = None if imgPrompt.seed is None else torch.Generator().manual_seed(int(imgPrompt.seed))
+
+#     image: Image = pipe(imgPrompt.prompt,
+#                         guidance_scale=imgPrompt.guidance_scale, 
+#                         num_inference_steps=imgPrompt.num_inference_steps, 
+#                         generator = generator, 
+#                     ).images[0]
+    
+#     return image
