@@ -25,6 +25,7 @@ import com.a504.chatcomposer.member.entity.Member;
 import com.a504.chatcomposer.music.dto.enums.Beat;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,6 +52,9 @@ public class Music {
 	@ManyToOne
 	@JoinColumn(name = "member_id")
 	private Member member;
+
+	@Column(name = "title", length = 20)
+	private String title;
 
 	@Column(name = "music_source", length = 100)
 	private String musicSource;
