@@ -1,12 +1,12 @@
 package com.a504.chatcomposer.member.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,17 +20,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "profile")
-public class Profile {
+@Table(name = "member_profile")
+public class MemberProfile {
 
 	@Id
-	@NotNull
-	private Long memberId;
+	@Column(name = "member_id", nullable = false)
+	private Long id;
 
-	@NotNull
 	@MapsId    // Profile의 memberId와 매핑 (1:1 식별관계)
-	@OneToOne(orphanRemoval = true)
-	@JoinColumn(name = "member_id")
+	@OneToOne
+	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
-
 }

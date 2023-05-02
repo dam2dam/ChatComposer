@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,9 +30,8 @@ import lombok.Setter;
 @Table(name = "prompt")
 public class Prompt {
 	@Id
-	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "prompt_id")
+	@Column(name = "prompt_id", nullable = false)
 	private Long id;
 
 	@NotNull
@@ -47,7 +47,7 @@ public class Prompt {
 
 	@NotNull
 	@Column(name = "created_at")
-	@ColumnDefault("now()")
+	@CreationTimestamp
+	@ColumnDefault("CURRENT_TIMESTAMP")
 	private LocalDateTime createdAt;
-
 }
