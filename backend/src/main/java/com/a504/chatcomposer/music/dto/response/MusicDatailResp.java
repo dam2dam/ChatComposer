@@ -23,7 +23,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MusicDatailRes {
+public class MusicDatailResp {
 
 	@JsonProperty(value = "music_id")
 	private long musicId;
