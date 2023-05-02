@@ -11,8 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Schema(title = "파일 Vo")
 public class MultipartFileReq {
-    @Schema(title = "멀티파트 이미지 File", description = "멀티 파트 이미지 File")
     private MultipartFile image;
 }
