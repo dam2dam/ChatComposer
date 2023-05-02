@@ -28,16 +28,16 @@ import lombok.Setter;
 @Entity
 @Table(name = "favorite_genre")
 public class FavoriteGenre {
+
 	@Id
-	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "favorite_genre_id")
+	@Column(name = "favorite_genre_id", nullable = false)
 	private Long id;
 
 	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "member_id")
-	private Member memberId;
+	private Member member;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)

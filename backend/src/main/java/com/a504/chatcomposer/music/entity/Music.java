@@ -18,6 +18,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.a504.chatcomposer.member.entity.FavoriteMusic;
 import com.a504.chatcomposer.member.entity.Member;
@@ -29,19 +30,21 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @Entity
 @Table(name = "music")
 public class Music {
+
 	@Id
-	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "music_id")
+	@Column(name = "music_id", nullable = false)
 	private Long id;
 
 	@NotNull
@@ -79,9 +82,9 @@ public class Music {
 	@Column(name = "cover_request", length = 500)
 	private String coverRequest;
 
-	@NotNull
-	@Column(name = "created_at")
-	@ColumnDefault("now()")
+	@Column(name = "created_at", nullable = false)
+	@CreationTimestamp
+	@ColumnDefault("CURRENT_TIMESTAMP")
 	private LocalDateTime createdAt;
 
 	@OneToMany(mappedBy = "music")

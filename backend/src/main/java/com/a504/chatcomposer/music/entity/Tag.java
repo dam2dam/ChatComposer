@@ -24,10 +24,10 @@ import lombok.Setter;
 @Entity
 @Table(name = "tag")
 public class Tag {
+
 	@Id
-	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "tag_id")
+	@Column(name = "tag_id", nullable = false)
 	private Long id;
 
 	@NotNull

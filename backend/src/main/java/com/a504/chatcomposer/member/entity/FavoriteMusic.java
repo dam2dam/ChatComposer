@@ -26,10 +26,10 @@ import lombok.Setter;
 @Entity
 @Table(name = "favorite_music")
 public class FavoriteMusic {
+
 	@Id
-	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "favorite_music_id")
+	@Column(name = "favorite_music_id", nullable = false)
 	private Long id;
 
 	@NotNull
