@@ -11,5 +11,5 @@ import com.a504.chatcomposer.music.dto.response.MusicsResp;
  */
 @Repository
 public interface MusicCustomRepository {
-	List<MusicsResp> getMusicList(String genre, Long tags, Long memberId, String title, String isLiked);
+	List<MusicsResp> getMusicList(String genre, Long tags, String nickname, String title, String isLiked);
 }

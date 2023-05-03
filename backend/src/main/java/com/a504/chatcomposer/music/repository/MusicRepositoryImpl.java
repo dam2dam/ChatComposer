@@ -23,51 +23,71 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MusicRepositoryImpl implements MusicCustomRepository {
 
-	private static final String YES = "Y";
+	private static final String YES = "y";
 	private final JPAQueryFactory jpaQueryFactory;
 	QMusic music = QMusic.music;
 	QFavoriteMusic favoriteMusic = QFavoriteMusic.favoriteMusic;
 	QTag tag = QTag.tag;
 
 	@Override
-	public List<MusicsResp> getMusicList(String genre, Long tags, Long memberId, String title, String isLiked) {
+	public List<MusicsResp> getMusicList(String genre, Long tags, String nickname, String title, String isLiked) {
 
 		Long userId = 0L;
 
 		List<MusicsResp> musicsResps = jpaQueryFactory
-			.select(new QMusicsResp(music, music.member.id, music.member.email))
+			.select(new QMusicsResp(
+				music,
+				music.member.id,
+				music.member.memberProfile.nickname))
 			.from(music)
 			.leftJoin(music.tags, tag)
 			.leftJoin(music.favoriteMusics, favoriteMusic)
 			.where(
-				tagEq(tags, tag),
-				// TODO: '나'의 선호음악이므로 로그인 회원 정보를 사용해야 함
-				isLikedEq(isLiked, userId),
 				genreEq(Genre.valueOf(genre)),
-				memberEq(memberId),
-				titleEq(title)
+				tagEq(tags),
+				nicknameContains(nickname),
+				titleContains(title),
+				// TODO: '나'의 선호음악이므로 로그인 회원 정보를 사용해야 함
+				isLikedEq(isLiked, userId)
 			).fetch();
 
 		log.info("MusicRepositoryImpl | getMusicList() fetch : {}", musicsResps);
+
+		// return !CollectionUtils.isEmpty(musicsResps) ? musicsResps : Collections.emptyList();
 		return musicsResps;
 	}
 
+	/**
+	 * @return music.genre=?, or null
+	 */
 	private BooleanExpression genreEq(Genre genre) {
 		return genre != null ? music.genre.eq(genre) : null;
 	}
 
-	private BooleanExpression tagEq(Long tags, QTag tag) {
+	/**
+	 * @return tags.tag_id=?, or null
+	 */
+	private BooleanExpression tagEq(Long tags) {
 		return tags != null ? tag.id.eq(tags) : null;
 	}
 
-	private BooleanExpression memberEq(Long memberId) {
-		return memberId != null ? music.member.id.eq(memberId) : null;
+	/**
+	 * @return member_profile.nickname like ? escape '!', or null
+	 */
+	private BooleanExpression nicknameContains(String nickname) {
+		return StringUtils.hasText(nickname) ? music.member.memberProfile.nickname.contains(nickname) : null;
 	}
 
-	private BooleanExpression titleEq(String title) {
+	/**
+	 * @return music.title like ? escape '!', or null
+	 */
+	private BooleanExpression titleContains(String title) {
 		return StringUtils.hasText(title) ? music.title.contains(title) : null;
 	}
 
+	/**
+	 * @return favorite_music.member_id=?, or null
+	 */
 	private BooleanExpression isLikedEq(String isLiked, Long userId) {
 		return StringUtils.hasText(isLiked) && isLiked.equals(YES) ? favoriteMusic.member.id.eq(userId) : null;
 	}

@@ -2,7 +2,6 @@ package com.a504.chatcomposer.music.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,12 +34,11 @@ public class MusicController {
 	public ResponseEntity<?> getMusicList(
 		@RequestParam(required = false, value = "genre") String genre,
 		@RequestParam(required = false, value = "tags") long tags,
-		@RequestParam(required = false, value = "member") long memberId,
+		@RequestParam(required = false, value = "nickname") String nickname,
 		@RequestParam(required = false, value = "title") String title,
 		@RequestParam(required = false, value = "is-liked") String isLiked
 	) {
-
-		List<MusicsResp> musicsResps = musicService.getMusicList(genre, tags, memberId, title, isLiked);
-		return new ResponseEntity<>(musicsResps, HttpStatus.OK);
+		List<MusicsResp> musicsResps = musicService.getMusicList(genre, tags, nickname, title, isLiked);
+		return ResponseEntity.ok().body(musicsResps);
 	}
 }
