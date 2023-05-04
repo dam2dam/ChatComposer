@@ -3,7 +3,6 @@ package com.a504.chatcomposer.global.config.security;
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.global.config.properties.CorsProperties;
 import com.a504.chatcomposer.member.repository.UserRefreshTokenRepository;
-import com.a504.chatcomposer.oauth.entity.RoleType;
 import com.a504.chatcomposer.oauth.exception.RestAuthenticationEntryPoint;
 import com.a504.chatcomposer.oauth.filter.TokenAuthenticationFilter;
 import com.a504.chatcomposer.oauth.handler.OAuth2AuthenticationFailureHandler;
@@ -27,7 +26,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
@@ -89,11 +87,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .accessDeniedHandler(tokenAccessDeniedHandler)
                 .and()
                     .authorizeRequests()
-                    .antMatchers(PERMIT_URL_ARRAY).permitAll()
-                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                    .antMatchers("/api/**").hasAnyAuthority(RoleType.USER.getCode())
-                    .antMatchers("/api/**/admin/**").hasAnyAuthority(RoleType.ADMIN.getCode())
-                    .anyRequest().authenticated()
+                    .anyRequest().permitAll()
+//                    .antMatchers(PERMIT_URL_ARRAY).permitAll()
+//                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+//                    .antMatchers("/api/**").hasAnyAuthority(RoleType.USER.getCode())
+//                    .antMatchers("/api/**/admin/**").hasAnyAuthority(RoleType.ADMIN.getCode())
+//                    .anyRequest().authenticated()
                 .and()
                     .oauth2Login()
                     .authorizationEndpoint()
