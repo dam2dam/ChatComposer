@@ -52,6 +52,9 @@ public class Music {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
+	@Column(name = "title", length = 20)
+	private String title;
+
 	@Column(name = "music_source", length = 100)
 	private String musicSource;
 
@@ -91,9 +94,8 @@ public class Music {
 	private List<Track> tracks = new ArrayList<>();
 
 	@OneToMany(mappedBy = "music")
-	private List<Tag> tags = new ArrayList<>();
-
-	@OneToMany(mappedBy = "music")
 	private List<FavoriteMusic> favoriteMusics = new ArrayList<>();
 
+	@OneToMany(mappedBy = "music")
+	private List<MusicTag> musicTags = new ArrayList<>();
 }
