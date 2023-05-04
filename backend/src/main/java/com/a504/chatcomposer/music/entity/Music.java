@@ -25,7 +25,6 @@ import com.a504.chatcomposer.member.entity.Member;
 import com.a504.chatcomposer.music.dto.enums.Beat;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -95,9 +94,8 @@ public class Music {
 	private List<Track> tracks = new ArrayList<>();
 
 	@OneToMany(mappedBy = "music")
-	private List<Tag> tags = new ArrayList<>();
-
-	@OneToMany(mappedBy = "music")
 	private List<FavoriteMusic> favoriteMusics = new ArrayList<>();
 
+	@OneToMany(mappedBy = "music")
+	private List<MusicTag> musicTags = new ArrayList<>();
 }

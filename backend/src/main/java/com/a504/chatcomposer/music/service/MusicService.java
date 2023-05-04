@@ -18,8 +18,9 @@ public class MusicService {
 	/**
 	 *	음악 리스트 조회
 	 */
-	public List<MusicsResp> getMusicList(String genre, long tags, String nickname, String title, String isLiked) {
+	public List<MusicsResp> getMusicList(int genre, String tag, String nickname, String title, String isMyFavorite,
+		Long loginUserId) {
 
-		return musicRepository.getMusicList(genre, tags, nickname, title, isLiked);
+		return musicRepository.getMusicList(genre, tag, nickname, title, isMyFavorite, loginUserId);
 	}
 }

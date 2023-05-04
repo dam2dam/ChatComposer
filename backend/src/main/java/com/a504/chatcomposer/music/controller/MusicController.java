@@ -32,13 +32,17 @@ public class MusicController {
 	})
 	@GetMapping
 	public ResponseEntity<?> getMusicList(
-		@RequestParam(required = false, value = "genre") String genre,
-		@RequestParam(required = false, value = "tags") long tags,
+		@RequestParam(required = false, value = "genre") int genre,
+		@RequestParam(required = false, value = "tag") String tag,
 		@RequestParam(required = false, value = "nickname") String nickname,
 		@RequestParam(required = false, value = "title") String title,
-		@RequestParam(required = false, value = "is-liked") String isLiked
-	) {
-		List<MusicsResp> musicsResps = musicService.getMusicList(genre, tags, nickname, title, isLiked);
+		@RequestParam(required = false, value = "is-my-favorite") String isMyFavorite) {
+
+		// TODO: 로그인 유저 정보 (member pk) 사용
+		Long loginUserId = 1L;
+
+		List<MusicsResp> musicsResps = musicService.getMusicList(genre, tag, nickname, title, isMyFavorite,
+			loginUserId);
 		return ResponseEntity.ok().body(musicsResps);
 	}
 }
