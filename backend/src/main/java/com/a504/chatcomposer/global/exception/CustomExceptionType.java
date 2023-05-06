@@ -14,7 +14,8 @@ public enum CustomExceptionType {
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보가 존재하지 않습니다"),
 
 	// MUSIC
-	MUSIC_NOT_FOUND(HttpStatus.NOT_FOUND, "음악 정보가 존재하지 않습니다");
+	MUSIC_NOT_FOUND(HttpStatus.NOT_FOUND, "음악 정보가 존재하지 않습니다"),
+	FAIL_TO_DELETE_FAVORITE_MUSIC(HttpStatus.NOT_FOUND, "음악 좋아요 취소에 실패했습니다.");
 
 	private final HttpStatus httpStatus;
 	private final int code;

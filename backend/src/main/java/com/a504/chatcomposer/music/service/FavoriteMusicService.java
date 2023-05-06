@@ -1,6 +1,7 @@
 package com.a504.chatcomposer.music.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.a504.chatcomposer.global.exception.CustomException;
 import com.a504.chatcomposer.global.exception.CustomExceptionType;
@@ -24,6 +25,7 @@ public class FavoriteMusicService {
 	/**
 	 * 음악 좋아요 추가
 	 */
+	@Transactional
 	public void createFavoriteMusic(Long musicId, Long loginUserId) {
 
 		Music music = musicRepository.findById(musicId)
@@ -37,5 +39,22 @@ public class FavoriteMusicService {
 			.music(music)
 			.member(member)
 			.build());
+	}
+
+	/**
+	 * 음악 좋아요 삭제
+	 */
+	@Transactional
+	public void deleteFavoriteMusic(Long musicId, Long loginUserId) {
+
+		Music music = musicRepository.findById(musicId)
+			.orElseThrow(() -> new CustomException(CustomExceptionType.MUSIC_NOT_FOUND));
+		
+		FavoriteMusic favoriteMusic = favoriteMusicRepository.findByMusic_idAndMember_id(musicId, loginUserId)
+			.orElseThrow(() -> new CustomException(
+				CustomExceptionType.FAIL_TO_DELETE_FAVORITE_MUSIC));
+
+		music.setFavoriteCount(music.getFavoriteCount() - 1);
+		favoriteMusicRepository.delete(favoriteMusic);
 	}
 }

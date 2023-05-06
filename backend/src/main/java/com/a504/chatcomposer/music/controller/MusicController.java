@@ -3,6 +3,7 @@ package com.a504.chatcomposer.music.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,5 +65,20 @@ public class MusicController {
 
 		favoriteMusicService.createFavoriteMusic(musicId, loginUserId);
 		return ResponseEntity.ok().body(new BaseResponseBody(200, "음악 좋아요를 추가했습니다."));
+	}
+
+	@Operation(summary = "음악 좋아요 삭제", description = "음악에 좋아요를 삭제합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "음악 좋아요 삭제 완료"),
+		@ApiResponse(responseCode = "404", description = "음악 좋아요 삭제 실패")
+	})
+	@DeleteMapping("/musics/{music_id}")
+	public ResponseEntity<?> deleteFavoriteMusic(@PathVariable("music_id") Long musicId) {
+
+		// TODO: 로그인 유저 정보 (member pk) 사용
+		Long loginUserId = 1L;
+
+		favoriteMusicService.deleteFavoriteMusic(musicId, loginUserId);
+		return ResponseEntity.ok().body(new BaseResponseBody(200, "음악 좋아요를 취소했습니다."));
 	}
 }

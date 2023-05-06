@@ -1,5 +1,8 @@
 package com.a504.chatcomposer.global.util;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,17 +11,19 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BaseResponseBody {
 	String msg = null;
 	Integer statusCode = null;
 
-	public BaseResponseBody() {}
+	public BaseResponseBody() {
+	}
 
-	public BaseResponseBody(Integer statusCode){
+	public BaseResponseBody(Integer statusCode) {
 		this.statusCode = statusCode;
 	}
 
-	public BaseResponseBody(Integer statusCode, String msg){
+	public BaseResponseBody(Integer statusCode, String msg) {
 		this.statusCode = statusCode;
 		this.msg = msg;
 	}
