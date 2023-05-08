@@ -48,6 +48,9 @@ dependencies {
     // swagger
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
 
+    //RabbitMQ
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
     // lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -57,6 +60,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'junit:junit'
     testImplementation 'org.projectlombok:lombok:1.18.22'
+
 }
 
 tasks.named('test') {
