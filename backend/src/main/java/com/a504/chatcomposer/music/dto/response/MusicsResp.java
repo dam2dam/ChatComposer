@@ -1,5 +1,7 @@
 package com.a504.chatcomposer.music.dto.response;
 
+import static com.a504.chatcomposer.global.util.Utils.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +12,8 @@ import com.a504.chatcomposer.member.entity.FavoriteMusic;
 import com.a504.chatcomposer.music.dto.Member;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 import com.a504.chatcomposer.music.entity.Music;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
@@ -27,36 +29,25 @@ import lombok.extern.slf4j.Slf4j;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Slf4j
+@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MusicsResp {
 
-	public static final String NO = "n";
-	public static final String YES = "y";
-	@JsonProperty(value = "music_id")
 	private long musicId;
 
-	@JsonProperty(value = "member")
 	private Member member;
 
-	@JsonProperty(value = "title")
 	private String title;
 
-	@JsonProperty(value = "genre")
 	private Genre genre;
 
-	@JsonProperty(value = "tags")
 	private List<String> tags;
 
-	@JsonProperty(value = "favorite_count")
 	private int favoriteCount;
 
-	@JsonProperty(value = "created_at")
 	private LocalDateTime createdAt;
 
-	@JsonProperty(value = "cover_source")
 	private String coverSource;
 
-	@JsonProperty(value = "is_my_favorite")
 	private String isMyFavorite;
 
 	@QueryProjection
@@ -82,7 +73,8 @@ public class MusicsResp {
 		// 내가 좋아요 한 음악인지 여부
 		String isMyFavorite = NO;
 		List<FavoriteMusic> favoriteMusics = music.getFavoriteMusics();
-		if (!CollectionUtils.isEmpty(favoriteMusics)) {
+		// 누군가 좋아요 한 음악이고 로그인 된 요청이라면 음악 좋아요 여부 판단
+		if (!CollectionUtils.isEmpty(favoriteMusics) && loginUserId != NOT_LOGIN) {
 			for (int i = 0; i < favoriteMusics.size(); i++) {
 				if (favoriteMusics.get(i).getMember().getId().equals(loginUserId)) {
 					isMyFavorite = YES;
@@ -90,6 +82,7 @@ public class MusicsResp {
 				}
 			}
 		}
+		// 아무도 좋아요를 누르지 않은 음악이거나 로그인 하지 않은 상태의 요청은 무조건 NO
 		this.isMyFavorite = isMyFavorite;
 	}
 }

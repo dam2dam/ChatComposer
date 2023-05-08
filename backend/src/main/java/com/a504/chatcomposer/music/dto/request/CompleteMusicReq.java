@@ -8,7 +8,8 @@ import com.a504.chatcomposer.music.dto.Prompt;
 import com.a504.chatcomposer.music.dto.Track;
 import com.a504.chatcomposer.music.dto.enums.Beat;
 import com.a504.chatcomposer.music.dto.enums.Genre;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,44 +22,32 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CompleteMusicReq {
 
-	@JsonProperty(value = "title")
 	private MultipartFile title;
 
-	@JsonProperty(value = "tags")
 	private List<Integer> tags;
 
-	@JsonProperty(value = "description")
 	private String description;
 
-	@JsonProperty(value = "genre")
 	private Genre genre;
 
-	@JsonProperty(value = "beat")
 	private Beat beat;
 
-	@JsonProperty(value = "tracks")
 	private List<Track> tracks;
 
-	@JsonProperty(value = "prompts")
 	private List<Prompt> prompts;
 
-	@JsonProperty(value = "music_source")
 	private String musicSource;
 
-	@JsonProperty(value = "mixed_music_request")
 	private String mixedMusicRequest;
 
-	@JsonProperty(value = "mixed_music")
 	private String mixedMusic;
 
-	@JsonProperty(value = "cover_request")
 	private String coverRequest;
 
-	@JsonProperty(value = "cover_source")
 	private String coverSource;
 
-	@JsonProperty(value = "favorite_count")
 	private int favoriteCount;
 }
