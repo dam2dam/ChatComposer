@@ -55,7 +55,7 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 				isLikedEq(isMyFavorite, loginUserId)
 			).fetch();
 
-		log.info("MusicRepositoryImpl | getMusicList() fetch : {}", musicsResps);
+		log.info("MusicRepositoryImpl | getMusicList() musicsResps : {}", musicsResps);
 
 		// return !CollectionUtils.isEmpty(musicsResps) ? musicsResps : Collections.emptyList();
 		return musicsResps;
