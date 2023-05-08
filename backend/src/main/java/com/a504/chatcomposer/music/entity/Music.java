@@ -30,14 +30,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 @Entity
 @Table(name = "music")
 public class Music {
@@ -55,13 +53,16 @@ public class Music {
 	@Column(name = "title", length = 20)
 	private String title;
 
-	@Column(name = "music_source", length = 100)
+	@Column(name = "description", length = 200)
+	private String description;
+
+	@Column(name = "music_source", length = 200)
 	private String musicSource;
 
-	@Column(name = "mixed_music_source", length = 100)
+	@Column(name = "mixed_music_source", length = 200)
 	private String mixedMusicSource;
 
-	@Column(name = "cover_source", length = 100)
+	@Column(name = "cover_source", length = 200)
 	private String coverSource;
 
 	@NotNull
