@@ -57,7 +57,7 @@ public class MusicController {
 		@ApiResponse(responseCode = "200", description = "음악 좋아요 완료"),
 		@ApiResponse(responseCode = "404", description = "음악 좋아요 실패")
 	})
-	@PostMapping("/musics/{music_id}")
+	@PostMapping("/{music_id}")
 	public ResponseEntity<?> createFavoriteMusic(@PathVariable("music_id") Long musicId) {
 
 		// TODO: 로그인 유저 정보 (member pk) 사용
@@ -72,7 +72,7 @@ public class MusicController {
 		@ApiResponse(responseCode = "200", description = "음악 좋아요 삭제 완료"),
 		@ApiResponse(responseCode = "404", description = "음악 좋아요 삭제 실패")
 	})
-	@DeleteMapping("/musics/{music_id}")
+	@DeleteMapping("/{music_id}")
 	public ResponseEntity<?> deleteFavoriteMusic(@PathVariable("music_id") Long musicId) {
 
 		// TODO: 로그인 유저 정보 (member pk) 사용
