@@ -65,7 +65,7 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 			.leftJoin(music.favoriteMusics, favoriteMusic)
 			.where(
 				genreEq(genre),
-				tagNameEq(tagName),
+				tagNameContains(tagName),
 				nicknameContains(nickname),
 				titleContains(title),
 				// TODO: '나'의 선호음악이므로 로그인 회원 정보를 사용해야 함
@@ -118,7 +118,7 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 	}
 
 	/**
-	 * @return loginUserId or -1L (Not login)
+	 * @return loginUserId (Login), or -1L (Not login)
 	 */
 	private Long isMember(Long loginUserId) {
 		return loginUserId != null ? loginUserId : NOT_LOGIN;
@@ -132,10 +132,10 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 	}
 
 	/**
-	 * @return tag.tag_name=?, or null
+	 * @return tag.tag_name like ? escape '!', or null
 	 */
-	private BooleanExpression tagNameEq(String tagName) {
-		return tagName != null ? tag.tagName.eq(tagName) : null;
+	private BooleanExpression tagNameContains(String tagName) {
+		return tagName != null ? tag.tagName.contains(tagName) : null;
 	}
 
 	/**
@@ -159,5 +159,4 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 		return StringUtils.hasText(isMyFavorite) && isMyFavorite.equals(YES) ? favoriteMusic.member.id.eq(loginUserId) :
 			null;
 	}
-
 }

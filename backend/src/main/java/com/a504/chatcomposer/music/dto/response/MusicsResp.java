@@ -81,7 +81,7 @@ public class MusicsResp {
 
 		// music tags -> tag name 리스트로 만들기
 		this.tags = music.getMusicTags().stream()
-			.map(m -> m.getTag().getTagName()).collect(Collectors.toList());
+			.map(musicTag -> musicTag.getTag().getTagName()).collect(Collectors.toList());
 
 		// 내가 좋아요 한 음악인지 여부
 		String isMyFavorite = NO;
