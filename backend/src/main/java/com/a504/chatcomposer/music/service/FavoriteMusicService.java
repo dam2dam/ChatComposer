@@ -34,6 +34,12 @@ public class FavoriteMusicService {
 		Member member = memberRepository.findById(loginUserId)
 			.orElseThrow(() -> new CustomException(CustomExceptionType.MEMBER_NOT_FOUND));
 
+		FavoriteMusic favoriteMusic = favoriteMusicRepository.findByMusic_idAndMember_id(musicId, loginUserId)
+			.orElse(null);
+		if (favoriteMusic != null) {
+			throw new CustomException(CustomExceptionType.DUPLICATE_FAVORITE_MUSIC);
+		}
+
 		music.setFavoriteCount(music.getFavoriteCount() + 1);
 		favoriteMusicRepository.save(FavoriteMusic.builder()
 			.music(music)
@@ -49,7 +55,7 @@ public class FavoriteMusicService {
 
 		Music music = musicRepository.findById(musicId)
 			.orElseThrow(() -> new CustomException(CustomExceptionType.MUSIC_NOT_FOUND));
-		
+
 		FavoriteMusic favoriteMusic = favoriteMusicRepository.findByMusic_idAndMember_id(musicId, loginUserId)
 			.orElseThrow(() -> new CustomException(
 				CustomExceptionType.FAIL_TO_DELETE_FAVORITE_MUSIC));

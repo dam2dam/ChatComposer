@@ -11,10 +11,11 @@ public enum CustomExceptionType {
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류 입니다."),
 
 	// USER
-	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보가 존재하지 않습니다"),
+	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 정보가 존재하지 않습니다."),
 
 	// MUSIC
-	MUSIC_NOT_FOUND(HttpStatus.NOT_FOUND, "음악 정보가 존재하지 않습니다"),
+	MUSIC_NOT_FOUND(HttpStatus.NOT_FOUND, "음악 정보가 존재하지 않습니다."),
+	DUPLICATE_FAVORITE_MUSIC(HttpStatus.BAD_REQUEST, "이미 좋아요 한 음악입니다."),
 	FAIL_TO_DELETE_FAVORITE_MUSIC(HttpStatus.NOT_FOUND, "음악 좋아요 취소에 실패했습니다.");
 
 	private final HttpStatus httpStatus;
