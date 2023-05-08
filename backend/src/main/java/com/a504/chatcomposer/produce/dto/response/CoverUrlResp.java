@@ -12,9 +12,10 @@ import lombok.*;
 public class CoverUrlResp extends BaseResponseBody {
     private String coverSource;
 
-    public static CoverUrlResp of(String msg, String coverSource) {
+    public static CoverUrlResp of(String msg, Integer statusCode, String coverSource) {
         CoverUrlResp res = new CoverUrlResp();
         res.setMsg(msg);
+        res.setStatusCode(statusCode);
         res.setCoverSource(coverSource);
         return res;
     }

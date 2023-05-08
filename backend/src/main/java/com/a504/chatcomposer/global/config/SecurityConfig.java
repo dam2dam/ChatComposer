@@ -74,14 +74,14 @@ public class SecurityConfig {
 
                 .and()    // 요청 권한 설정
                 .authorizeRequests()
-//                .anyRequest().permitAll()
-                .antMatchers(PERMIT_URL_ARRAY).permitAll()
+                .anyRequest().permitAll()
+//                .antMatchers(PERMIT_URL_ARRAY).permitAll()
 //                .antMatchers("/peak/**").permitAll()
 //                .antMatchers("/idol/**").permitAll()
 //                .antMatchers("/news/**").permitAll()
 //                .antMatchers("/youtube/**").permitAll()
 //
-                .anyRequest().authenticated()    // 이외의 모든 요청은 인증 필요
+//                .anyRequest().authenticated()    // 이외의 모든 요청은 인증 필요
                 // .antMatchers("/user/**").hasAnyRole("USER", "GUEST")
                 // .anyRequest().permitAll()
 

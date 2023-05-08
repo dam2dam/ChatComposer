@@ -19,7 +19,7 @@ public class ExceptionAdvice {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     protected ResponseEntity<? extends BaseResponseBody> applicantDuplicationException(IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+        e.printStackTrace();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, e.getMessage()));
     }
 }
