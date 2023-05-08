@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
 import com.a504.chatcomposer.member.entity.FavoriteMusic;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.querydsl.core.annotations.QueryProjection;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+@Schema(description = "음악 리스트를 위한 정보 DTO")
 @Getter
 @Setter
 @Builder
@@ -32,22 +35,32 @@ import lombok.ToString;
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MusicsResp {
 
+	@Schema(description = "음악 pk")
 	private long musicId;
 
+	@Schema(description = "작성자 정보")
 	private Member member;
 
+	@Schema(description = "음악 제목")
 	private String title;
 
+	@Schema(description = "장르")
 	private Genre genre;
 
+	@Schema(description = "태그 목록")
 	private List<String> tags;
 
+	@Schema(description = "좋아요 수", defaultValue = "0")
 	private int favoriteCount;
 
+	@DateTimeFormat(pattern = "")
+	@Schema(description = "음악 생성일")
 	private LocalDateTime createdAt;
 
+	@Schema(description = "앨범 커버 이미지의 S3 URL")
 	private String coverSource;
 
+	@Schema(description = "좋아요 여부", defaultValue = "n", allowableValues = {"y", "n"})
 	private String isMyFavorite;
 
 	@QueryProjection
