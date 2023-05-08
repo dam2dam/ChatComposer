@@ -1,16 +1,27 @@
 package com.a504.chatcomposer.music.repository;
 
+import static com.a504.chatcomposer.global.util.Utils.*;
+
 import java.util.List;
 
 import org.springframework.util.StringUtils;
 
+import com.a504.chatcomposer.global.exception.CustomException;
+import com.a504.chatcomposer.global.exception.CustomExceptionType;
 import com.a504.chatcomposer.member.entity.QFavoriteMusic;
+import com.a504.chatcomposer.member.entity.QMember;
+import com.a504.chatcomposer.member.entity.QMemberProfile;
 import com.a504.chatcomposer.music.dto.enums.Genre;
+import com.a504.chatcomposer.music.dto.response.MusicDetailResp;
 import com.a504.chatcomposer.music.dto.response.MusicsResp;
+import com.a504.chatcomposer.music.dto.response.QMusicDetailResp;
 import com.a504.chatcomposer.music.dto.response.QMusicsResp;
+import com.a504.chatcomposer.music.entity.Music;
 import com.a504.chatcomposer.music.entity.QMusic;
 import com.a504.chatcomposer.music.entity.QMusicTag;
+import com.a504.chatcomposer.music.entity.QPrompt;
 import com.a504.chatcomposer.music.entity.QTag;
+import com.a504.chatcomposer.music.entity.QTrack;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -25,20 +36,26 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MusicRepositoryImpl implements MusicCustomRepository {
 
-	private static final String YES = "y";
 	private final JPAQueryFactory jpaQueryFactory;
 	QFavoriteMusic favoriteMusic = QFavoriteMusic.favoriteMusic;
 	QMusic music = QMusic.music;
 	QMusicTag musicTag = QMusicTag.musicTag;
 	QTag tag = QTag.tag;
+	QTrack track = QTrack.track;
+	QPrompt prompt = QPrompt.prompt;
+	QMember member = QMember.member;
+	QMemberProfile memberProfile = QMemberProfile.memberProfile;
 
 	@Override
-	public List<MusicsResp> getMusicList(int genre, String tagName, String nickname, String title, String isMyFavorite,
+	public List<MusicsResp> getMusicList(Integer genre, String tagName, String nickname, String title,
+		String isMyFavorite,
 		Long loginUserId) {
+
+		log.info("MusicRepositoryImpl | getMusicList() loginUserId : {} ", loginUserId);
 
 		List<MusicsResp> musicsResps = jpaQueryFactory
 			.select(new QMusicsResp(
-				Expressions.asNumber(loginUserId).as("loginUserId"),
+				Expressions.asNumber(isMember(loginUserId)).as("loginUserId"),
 				music,
 				music.member.id,
 				music.member.memberProfile.nickname))
@@ -59,6 +76,52 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 
 		// return !CollectionUtils.isEmpty(musicsResps) ? musicsResps : Collections.emptyList();
 		return musicsResps;
+	}
+
+	@Override
+	public MusicDetailResp getMusicDetail(Long musicId, Long loginUserId) {
+
+		log.info("MusicRepositoryImpl | getMusicDetail() loginUserId : {} ", loginUserId);
+
+		Music existMusic = jpaQueryFactory
+			.selectFrom(music)
+			.where(
+				music.id.eq(musicId)
+			)
+			.fetchOne();
+		if (existMusic == null) {
+			throw new CustomException(CustomExceptionType.MUSIC_NOT_FOUND);
+		}
+
+		MusicDetailResp musicDetailResp = jpaQueryFactory
+			.select(new QMusicDetailResp(
+				Expressions.asNumber(isMember(loginUserId)).as("loginUserId"),
+				music,
+				member.id,
+				memberProfile.nickname
+			))
+			.from(music)
+			.leftJoin(music.member, member)
+			.leftJoin(member.memberProfile, memberProfile)
+			.leftJoin(music.tracks, track)
+			.leftJoin(track.prompt, prompt)
+			.leftJoin(music.musicTags, musicTag)
+			.join(musicTag.tag, tag)
+			.where(
+				music.id.eq(musicId)
+			)
+			.fetchFirst();
+
+		log.info("MusicRepositoryImpl | getMusicDetail() musicDetailResp : {} ", musicDetailResp);
+
+		return musicDetailResp;
+	}
+
+	/**
+	 * @return loginUserId or -1L (Not login)
+	 */
+	private Long isMember(Long loginUserId) {
+		return loginUserId != null ? loginUserId : NOT_LOGIN;
 	}
 
 	/**
@@ -96,4 +159,5 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 		return StringUtils.hasText(isMyFavorite) && isMyFavorite.equals(YES) ? favoriteMusic.member.id.eq(loginUserId) :
 			null;
 	}
+
 }
