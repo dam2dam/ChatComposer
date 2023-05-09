@@ -6,6 +6,7 @@ import com.a504.chatcomposer.produce.dto.response.CoverUrlResp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import com.rabbitmq.client.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -18,6 +19,7 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 @Service("ProduceService")
 @RequiredArgsConstructor
@@ -33,6 +37,7 @@ import java.util.UUID;
 public class ProduceServiceImpl implements ProduceService {
     private final Logger LOGGER = LoggerFactory.getLogger(ProduceServiceImpl.class);
     private final S3Uploader s3Uploader;
+    private final Channel channel;
     private final RabbitTemplate rabbitTemplate;
 
 //    @Override
@@ -78,41 +83,46 @@ public class ProduceServiceImpl implements ProduceService {
 //    }
 
     @Override
-    public CoverUrlResp createCover(String coverRequest) throws IOException {
-        CoverUrlResp coverUrlResp = CoverUrlResp.of("성공!", 200, coverRequest);
+    public CoverUrlResp createCover(String coverRequest) throws IOException, InterruptedException {
+        CoverUrlResp coverUrlResp = CoverUrlResp.of("Success!", 200, coverRequest);
 
-        // correlation ID 생성
+        // Generate correlation ID
         String correlationId = UUID.randomUUID().toString();
 
-        // 보낼 객체 Message 객체에 같이 보내기 위해 바이트 배열로 직렬화
+        // Convert CoverUrlResp object to byte array
         ObjectMapper objectMapper = new ObjectMapper();
         byte[] body = objectMapper.writeValueAsBytes(coverUrlResp);
 
-        // request queue에 보낼 message 설정
-        MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setCorrelationId(correlationId);
-        messageProperties.setReplyTo("response.queue");
-//        messageProperties.setExpiration("1000000");
-        Message message = new Message(body, messageProperties);
+        //unique Queue create
+//        String replyQueueName = channel.queueDeclare().getQueue();
+        String replyQueueName = "response.queue";
 
-        // convertSendAndReceive() 함수를 사용하여 RPC 구현
-        Message replyMessage = (Message) rabbitTemplate.convertSendAndReceive("music.exchange", "diffusion.key", message,
-                new MessagePostProcessor() {
-                    @Override
-                    public Message postProcessMessage(Message message) throws AmqpException {
-                        message.getMessageProperties().setCorrelationId(correlationId);
-                        message.getMessageProperties().setReplyTo("response.queue");
-//                        message.getMessageProperties().setExpiration("1000000"); // set the message expiration time to 10 seconds
-                        return message;
-                    }
-                });
+        //properties setting
+        AMQP.BasicProperties props = new AMQP.BasicProperties
+                .Builder()
+                .correlationId(correlationId)
+                .replyTo(replyQueueName)
+                .build();
 
-        if (replyMessage == null) {
-            throw new IllegalArgumentException("RabbitMQ에서 받아온 message가 존재하지않습니다.");
-        }
-        // response message에서 결과 추출
-        byte[] replyBody = replyMessage.getBody();
-        CoverUrlResp result = objectMapper.readValue(replyBody, CoverUrlResp.class);
+        //Send Request
+        channel.basicPublish("music.exchange", "diffusion.key", props, body);
+
+        //차단하는 Queue...? 추측: correlationId 가 다르면 차단
+        final BlockingQueue<String> response = new ArrayBlockingQueue<>(1);
+
+        DeliverCallback callback = (consumerTag, delivery) -> {
+            //되받은 메세지에 담긴 correlationId를 요청보낸 correlationId와 대조
+            if(delivery.getProperties().getCorrelationId().equals(correlationId))
+                response.offer(new String(delivery.getBody(), "UTF-8"));
+        };
+
+        String ctag = channel.basicConsume(replyQueueName, true, callback, consumerTag -> {});
+        String tmp = response.take();
+        channel.basicCancel(ctag);
+
+        // extract result from response message
+//        byte[] replyBody = replyMessage.getBody();
+        CoverUrlResp result = CoverUrlResp.of("Success!", 200, tmp);
 
         return result;
     }
