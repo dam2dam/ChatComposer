@@ -1,4 +1,4 @@
-package com.a504.chatcomposer.music.entity;
+package com.a504.chatcomposer.tag.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import com.a504.chatcomposer.music.entity.MusicTag;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +35,7 @@ public class Tag {
 	private Long id;
 
 	@NotNull
-	@Column(name = "tag_name", length = 20)
+	@Column(name = "tag_name", length = 200)
 	private String tagName;
 
 	@OneToMany(mappedBy = "tag")

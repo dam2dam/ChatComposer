@@ -1,5 +1,9 @@
-package com.a504.chatcomposer.music.dto;
+package com.a504.chatcomposer.tag.dto.response;
 
+import java.util.List;
+
+import com.a504.chatcomposer.tag.dto.Tag;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -10,18 +14,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Schema(description = "태그 정보 DTO")
+@Schema(description = "태그 목록 조회 응답 DTO")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Tag {
+public class TagsResp {
 
-	@Schema(description = "태그 pk")
-	private Long tagId;
-
-	@Schema(description = "태그명")
-	private String tagName;
+	@Schema(description = "태그 정보")
+	@JsonProperty("tags")
+	public List<Tag> tags;
 }
