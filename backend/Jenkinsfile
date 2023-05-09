@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Gradle Build') {
+            steps {
+                dir("backend") {
+										sh 'sudo cp ~/backend/properties/application.yml src/main/resources/application.yml'
+                    sh 'sudo chmod +x gradlew'
+                    sh 'sudo ./gradlew clean build -x test'
+                }
+            }
+        }
+        
+        stage('Backend Docker Build') {
+            steps {
+                dir("backend") {
+                    sh 'docker build -t chco-backend:latest .'
+                }
+            }
+        }
+
+        stage('Backend Deploy') {
+            steps {
+                sh 'docker rm -f backend'
+                sh 'docker run -d --name backend -p 8093:8080 -u root chco-backend:latest'
+            }
+        }
+
+        stage('Finish') {
+            steps {
+                sh 'docker images -qf dangling=true | xargs -I{} docker rmi {}'
+            }
+        }
+    }
+}
