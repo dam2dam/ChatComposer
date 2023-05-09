@@ -58,7 +58,7 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 				Expressions.asNumber(isMember(loginUserId)).as("loginUserId"),
 				music,
 				music.member.id,
-				music.member.memberProfile.nickname))
+				music.member.memberProfile.nickname)).distinct()
 			.from(music)
 			.leftJoin(music.musicTags, musicTag)
 			.leftJoin(musicTag.tag, tag)
