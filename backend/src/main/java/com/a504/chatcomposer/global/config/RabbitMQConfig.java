@@ -1,5 +1,6 @@
 package com.a504.chatcomposer.global.config;
 
+import com.rabbitmq.client.*;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -9,6 +10,9 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 @Configuration
 public class RabbitMQConfig {
@@ -38,23 +42,27 @@ public class RabbitMQConfig {
     FanoutExchange fanoutExchange() {
         return new FanoutExchange("music.fanout");
     }
+    @Bean
+    public Channel channel() throws IOException, TimeoutException {
+        return connectionFactory().createConnection().createChannel(false);
+    }
 //    @Bean
 //    Binding binding(DirectExchange directExchange, Queue queue) {
 ////        return BindingBuilder.bind(queue).to(directExchange).with("diffusion.key");
 //        return BindingBuilder.bind(queue).to(directExchange).with();
 //    }
 
-    @Bean
-    Binding binding(FanoutExchange fanoutExchange, Queue queue) {
-//        return BindingBuilder.bind(queue).to(directExchange).with("diffusion.key");
-        return BindingBuilder.bind(queue).to(fanoutExchange);
-    }
+//    @Bean
+//    Binding binding(FanoutExchange fanoutExchange, Queue queue) {
+////        return BindingBuilder.bind(queue).to(directExchange).with("diffusion.key");
+//        return BindingBuilder.bind(queue).to(fanoutExchange);
+//    }
 
     @Bean
     RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
-        rabbitTemplate.setReplyTimeout(100000); // 100 seconds in milliseconds
+//        rabbitTemplate.setReplyTimeout(50000); // 100 seconds in milliseconds
         return rabbitTemplate;
     }
 

@@ -40,7 +40,7 @@ public class ProduceController {
 
     @Operation(summary = "앨범 커버 제작", description = "응답받은 Prompt로 앨범 커버를 제작합니다.")
     @GetMapping(path = "/cover")
-    public ResponseEntity<CoverUrlResp> createCover(@RequestParam("cover-request") String coverRequest) throws IOException {
+    public ResponseEntity<CoverUrlResp> createCover(@RequestParam("cover-request") String coverRequest) throws IOException, InterruptedException {
 
         return ResponseEntity.status(200).body(produceService.createCover(coverRequest));
     }
