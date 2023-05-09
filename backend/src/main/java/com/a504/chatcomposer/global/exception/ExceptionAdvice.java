@@ -53,6 +53,7 @@ public class ExceptionAdvice {
 	 */
 	@ExceptionHandler(value = CustomException.class)
 	public ResponseEntity<? extends BaseResponseBody> customExceptionHandler(CustomException customException) {
+		log.info(customException.getMessage());
 		return getResponseEntity(customException.getException());
 	}
 

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.a504.chatcomposer.global.util.BaseResponseBody;
+import com.a504.chatcomposer.music.dto.response.MusicDetailResp;
 import com.a504.chatcomposer.music.dto.response.MusicsResp;
 import com.a504.chatcomposer.music.service.FavoriteMusicService;
 import com.a504.chatcomposer.music.service.MusicService;
@@ -38,18 +39,35 @@ public class MusicController {
 	})
 	@GetMapping
 	public ResponseEntity<?> getMusicList(
-		@RequestParam(required = false, value = "genre") int genre,
+		@RequestParam(required = false, value = "genre") Integer genre,
 		@RequestParam(required = false, value = "tag") String tag,
 		@RequestParam(required = false, value = "nickname") String nickname,
 		@RequestParam(required = false, value = "title") String title,
 		@RequestParam(required = false, value = "is-my-favorite") String isMyFavorite) {
 
-		// TODO: 로그인 유저 정보 (member pk) 사용
+		// TODO: 로그인 유저 정보 (member pk) 사용 (Nullable)
 		Long loginUserId = 1L;
+		// Long loginUserId = null;
 
 		List<MusicsResp> musicsResps = musicService.getMusicList(genre, tag, nickname, title, isMyFavorite,
 			loginUserId);
 		return ResponseEntity.ok().body(musicsResps);
+	}
+
+	@Operation(summary = "음악 상세 조회", description = "음악 상세 정보를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "음악 상세 조회 완료"),
+		@ApiResponse(responseCode = "404", description = "음악 상세 조회 실패")
+	})
+	@GetMapping("/{music_id}")
+	public ResponseEntity<?> getMusicDetail(@PathVariable("music_id") Long musicId) {
+
+		// TODO: 로그인 유저 정보 (member pk) 사용 (Nullable)
+		Long loginUserId = 1L;
+		// Long loginUserId = null;
+
+		MusicDetailResp musicDetailResp = musicService.getMusicDetail(musicId, loginUserId);
+		return ResponseEntity.ok().body(musicDetailResp);
 	}
 
 	@Operation(summary = "음악 좋아요 추가", description = "음악에 좋아요를 추가합니다.")

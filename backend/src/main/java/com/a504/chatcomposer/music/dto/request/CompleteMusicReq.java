@@ -8,57 +8,61 @@ import com.a504.chatcomposer.music.dto.Prompt;
 import com.a504.chatcomposer.music.dto.Track;
 import com.a504.chatcomposer.music.dto.enums.Beat;
 import com.a504.chatcomposer.music.dto.enums.Genre;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Schema(description = "음악 저장 요청 정보 DTO")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CompleteMusicReq {
 
-	@JsonProperty(value = "title")
+	@Schema(description = "음악 제목")
 	private MultipartFile title;
 
-	@JsonProperty(value = "tags")
-	private List<Integer> tags;
+	@Schema(description = "태그 목록")
+	private List<String> tags;
 
-	@JsonProperty(value = "description")
+	@Schema(description = "음악 설명")
 	private String description;
 
-	@JsonProperty(value = "genre")
+	@Schema(description = "장르")
 	private Genre genre;
 
-	@JsonProperty(value = "beat")
+	@Schema(description = "박자")
 	private Beat beat;
 
-	@JsonProperty(value = "tracks")
+	@Schema(description = "트랙 목록")
 	private List<Track> tracks;
 
-	@JsonProperty(value = "prompts")
+	@Schema(description = "프롬프트 목록")
 	private List<Prompt> prompts;
 
-	@JsonProperty(value = "music_source")
+	@Schema(description = "MIDI wav 파일 S3 URL")
 	private String musicSource;
 
-	@JsonProperty(value = "mixed_music_request")
+	@Schema(description = "리퓨전 요청 프롬프트")
 	private String mixedMusicRequest;
 
-	@JsonProperty(value = "mixed_music")
-	private String mixedMusic;
+	@Schema(description = "리퓨전 음악 wav 파일의 S3 URL")
+	private String mixedMusicSource;
 
-	@JsonProperty(value = "cover_request")
+	@Schema(description = "앨범 커버 요청 내용")
 	private String coverRequest;
 
-	@JsonProperty(value = "cover_source")
+	@Schema(description = "앨범 커버 이미지의 S3 URL")
 	private String coverSource;
 
-	@JsonProperty(value = "favorite_count")
+	@Schema(description = "좋아요 수", defaultValue = "0")
 	private int favoriteCount;
 }
