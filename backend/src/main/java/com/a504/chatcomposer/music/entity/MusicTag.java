@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.a504.chatcomposer.tag.entity.Tag;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

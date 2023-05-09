@@ -1,4 +1,4 @@
-package com.a504.chatcomposer.music.dto;
+package com.a504.chatcomposer.tag.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
