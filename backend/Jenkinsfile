@@ -4,10 +4,12 @@ pipeline {
     stages {
         stage('application.yml load'){
           steps {
+            dir("backend") {
             withCredentials([file(credentialsId: 'back-credential', variable: 'configFile')]){
               script {
-                sh 'cp $configFile src/main/resources/application.yml'
+                sh 'cp $configFile ./src/main/resources/application.yml'
               }
+            }
             }
           }
         }
