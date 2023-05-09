@@ -5,7 +5,7 @@ pipeline {
         stage('Gradle Build') {
             steps {
                 dir("backend") {
-										sh 'cp ~/backend/properties/application.yml src/main/resources/application.yml'
+										sh 'cp /home/ubuntu/backend/properties/application.yml src/main/resources/application.yml'
                     sh 'chmod +x gradlew'
                     sh './gradlew clean build -x test'
                 }
