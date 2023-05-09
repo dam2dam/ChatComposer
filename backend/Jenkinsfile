@@ -5,9 +5,9 @@ pipeline {
         stage('Gradle Build') {
             steps {
                 dir("backend") {
-										sh 'sudo cp ~/backend/properties/application.yml src/main/resources/application.yml'
-                    sh 'sudo chmod +x gradlew'
-                    sh 'sudo ./gradlew clean build -x test'
+										sh 'cp ~/backend/properties/application.yml src/main/resources/application.yml'
+                    sh 'chmod +x gradlew'
+                    sh './gradlew clean build -x test'
                 }
             }
         }
