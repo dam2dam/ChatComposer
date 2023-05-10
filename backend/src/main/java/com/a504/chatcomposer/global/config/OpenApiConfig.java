@@ -3,6 +3,7 @@ package com.a504.chatcomposer.global.config;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +25,12 @@ public class OpenApiConfig {
                 .scheme("bearer")
                 .bearerFormat("JWT");
 
+        SecurityRequirement securityItem = new SecurityRequirement().addList("bearer-token");
+
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("bearer-token", securityScheme))
+                .addSecurityItem(securityItem)
                 .info(info);
     }
+
 }
