@@ -3,6 +3,7 @@ package com.a504.chatcomposer.global.config.security;
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.global.config.properties.CorsProperties;
 import com.a504.chatcomposer.member.repository.UserRefreshTokenRepository;
+import com.a504.chatcomposer.oauth.entity.RoleType;
 import com.a504.chatcomposer.oauth.exception.RestAuthenticationEntryPoint;
 import com.a504.chatcomposer.oauth.filter.TokenAuthenticationFilter;
 import com.a504.chatcomposer.oauth.handler.OAuth2AuthenticationFailureHandler;
@@ -15,6 +16,7 @@ import com.a504.chatcomposer.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,6 +28,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
@@ -87,12 +90,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .accessDeniedHandler(tokenAccessDeniedHandler)
                 .and()
                     .authorizeRequests()
-                    .anyRequest().permitAll()
-//                    .antMatchers(PERMIT_URL_ARRAY).permitAll()
-//                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-//                    .antMatchers("/api/**").hasAnyAuthority(RoleType.USER.getCode())
-//                    .antMatchers("/api/**/admin/**").hasAnyAuthority(RoleType.ADMIN.getCode())
-//                    .anyRequest().authenticated()
+                    .antMatchers(PERMIT_URL_ARRAY).permitAll()
+                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                    .antMatchers(HttpMethod.GET,"/musics/**").permitAll()
+                    .antMatchers(HttpMethod.GET,"/musics/**").permitAll()
+                    .antMatchers("/v1/users/access").permitAll()
+                    .anyRequest().authenticated()
                 .and()
                     .oauth2Login()
                     .authorizationEndpoint()
@@ -150,6 +153,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     * */
     @Bean
     public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        System.out.println("SuccessHandler 메소드 호출.");
         return new OAuth2AuthenticationSuccessHandler(
                 tokenProvider,
                 appProperties,
@@ -163,6 +167,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * */
     @Bean
     public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+        System.out.println("FailureHandler 메소드 호출.");
         return new OAuth2AuthenticationFailureHandler(oAuth2AuthorizationRequestBasedOnCookieRepository());
     }
 
