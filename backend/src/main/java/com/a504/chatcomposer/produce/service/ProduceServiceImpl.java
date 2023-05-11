@@ -2,31 +2,18 @@ package com.a504.chatcomposer.produce.service;
 
 import com.a504.chatcomposer.global.util.S3Uploader;
 import com.a504.chatcomposer.produce.dto.request.MultipartFileReq;
-import com.a504.chatcomposer.produce.dto.response.CoverUrlResp;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.a504.chatcomposer.produce.dto.response.FileUrlResp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import com.rabbitmq.client.*;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessagePostProcessor;
-import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -83,15 +70,15 @@ public class ProduceServiceImpl implements ProduceService {
 //    }
 
     @Override
-    public CoverUrlResp createCover(String coverRequest) throws IOException, InterruptedException {
-        CoverUrlResp coverUrlResp = CoverUrlResp.of("Success!", 200, coverRequest);
+    public FileUrlResp createCover(String coverRequest) throws IOException, InterruptedException {
+        FileUrlResp fileUrlResp = FileUrlResp.of("Success!", 200, coverRequest);
 
         // Generate correlation ID
         String correlationId = UUID.randomUUID().toString();
 
         // Convert CoverUrlResp object to byte array
         ObjectMapper objectMapper = new ObjectMapper();
-        byte[] body = objectMapper.writeValueAsBytes(coverUrlResp);
+        byte[] body = objectMapper.writeValueAsBytes(fileUrlResp);
 
         //unique Queue create
 //        String replyQueueName = channel.queueDeclare().getQueue();
@@ -122,7 +109,7 @@ public class ProduceServiceImpl implements ProduceService {
 
         // extract result from response message
 //        byte[] replyBody = replyMessage.getBody();
-        CoverUrlResp result = CoverUrlResp.of("Success!", 200, tmp);
+        FileUrlResp result = FileUrlResp.of("Success!", 200, tmp);
 
         return result;
     }

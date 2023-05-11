@@ -1,17 +1,14 @@
 package com.a504.chatcomposer.produce.controller;
 
 import com.a504.chatcomposer.produce.dto.request.MultipartFileReq;
-import com.a504.chatcomposer.produce.dto.response.CoverUrlResp;
+import com.a504.chatcomposer.produce.dto.response.FileUrlResp;
 import com.a504.chatcomposer.produce.service.ProduceService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +37,7 @@ public class ProduceController {
 
     @Operation(summary = "앨범 커버 제작", description = "응답받은 Prompt로 앨범 커버를 제작합니다.")
     @GetMapping(path = "/cover")
-    public ResponseEntity<CoverUrlResp> createCover(@RequestParam("cover-request") String coverRequest) throws IOException, InterruptedException {
+    public ResponseEntity<FileUrlResp> createCover(@RequestParam("cover-request") String coverRequest) throws IOException, InterruptedException {
 
         return ResponseEntity.status(200).body(produceService.createCover(coverRequest));
     }
@@ -65,11 +62,11 @@ public class ProduceController {
                     content = @Content) })
     @Operation(summary = "앨범 커버 저장", description = "응답받은 이미지 파일로 앨범 커버를 S3에 저장합니다.")
     @PostMapping(path = "/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CoverUrlResp> saveCover(
+    public ResponseEntity<FileUrlResp> saveCover(
             @RequestPart MultipartFile image1) {
 
         String coverSource = produceService.saveCover(MultipartFileReq.builder().image(image1).build());
 
-        return ResponseEntity.status(200).body(CoverUrlResp.of("앨범 커버를 저장했습니다.", 200, coverSource));
+        return ResponseEntity.status(200).body(FileUrlResp.of("앨범 커버를 저장했습니다.", 200, coverSource));
     }
 }
