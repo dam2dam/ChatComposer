@@ -14,10 +14,12 @@ public interface ProduceService {
     // 믹싱 음악 생성
     byte[] createMusic(OriginalMusicReq originalMusicReq) throws IOException, InterruptedException;
     // 앨범 커버 이미지 생성
-    FileUrlResp createCover(String coverRequest) throws IOException, InterruptedException;
+    byte[] createCover(String coverRequest) throws IOException, InterruptedException;
     // 앨범 커버 이미지 저장
     String saveCover(MultipartFileReq image);
     // 원본 음악 파일 저장
     String saveMIDI(MultipartFileReq image);
+    // 믹싱 음악 파일 저장
+    String saveMusic(MultipartFileReq image);
 
 }

@@ -11,12 +11,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,10 +49,23 @@ public class ProduceController {
     })
     @PostMapping(path = "/musics/riffusion")
     public ResponseEntity<FileResp> createMusic(@RequestBody OriginalMusicReq originalMusicReq) throws IOException, InterruptedException {
-
+        // 믹싱 음악 생성하기
         byte[] result = produceService.createMusic(originalMusicReq);
 
         return ResponseEntity.status(200).body(FileResp.of("리퓨젼 음악을 생성했습니다.", 200, result));
+    }
+
+    @Operation(summary = "믹싱 음악 저장", description = "응답받은 믹싱 음악 파일을 S3에 저장합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "믹싱 음악 저장 완료"),
+            @ApiResponse(responseCode = "404", description = "믹싱 음악 저장 실패")
+    })
+    @PostMapping(path = "/musics/mixed")
+    public ResponseEntity<FileUrlResp> saveMusic(@ModelAttribute MultipartFileReq fileReq) {
+
+        String source = produceService.saveMusic(fileReq);
+
+        return ResponseEntity.status(200).body(FileUrlResp.of("믹싱 음악을 저장했습니다.", 200, source));
     }
 
     @Operation(summary = "앨범 커버 제작", description = "응답받은 Prompt로 앨범 커버를 제작합니다.")
@@ -57,9 +74,16 @@ public class ProduceController {
             @ApiResponse(responseCode = "404", description = "앨범 커버 제작 실패")
     })
     @GetMapping(path = "/cover")
-    public ResponseEntity<FileUrlResp> createCover(@RequestParam("cover-request") String coverRequest) throws IOException, InterruptedException {
+    public ResponseEntity<?> createCover(@RequestParam("cover-request") String coverRequest) throws IOException, InterruptedException {
+        // cover생성파일 byte[]로 가져오기
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("cover",produceService.createCover(coverRequest));
 
-        return ResponseEntity.status(200).body(produceService.createCover(coverRequest));
+        // header 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);
+
+        return ResponseEntity.status(200).headers(headers).body(resultMap);
     }
 
 
@@ -69,8 +93,7 @@ public class ProduceController {
             @ApiResponse(responseCode = "404", description = "앨범 커버 저장 실패")
     })
     @PostMapping(path = "/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<FileUrlResp> saveCover(
-            @ModelAttribute MultipartFileReq image) {
+    public ResponseEntity<FileUrlResp> saveCover(@ModelAttribute MultipartFileReq image) {
 
         String coverSource = produceService.saveCover(image);
 
