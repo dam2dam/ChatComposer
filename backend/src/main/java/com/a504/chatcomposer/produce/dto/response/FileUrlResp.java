@@ -9,14 +9,14 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CoverUrlResp extends BaseResponseBody {
-    private String coverSource;
+public class FileUrlResp extends BaseResponseBody {
+    private String source;
 
-    public static CoverUrlResp of(String msg, Integer statusCode, String coverSource) {
-        CoverUrlResp res = new CoverUrlResp();
+    public static FileUrlResp of(String msg, Integer statusCode, String coverSource) {
+        FileUrlResp res = new FileUrlResp();
         res.setMsg(msg);
         res.setStatusCode(statusCode);
-        res.setCoverSource(coverSource);
+        res.setSource(coverSource);
         return res;
     }
 
