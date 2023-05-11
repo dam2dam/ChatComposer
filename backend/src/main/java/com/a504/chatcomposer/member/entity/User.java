@@ -29,7 +29,7 @@ public class User {
     @Column(name = "USER_ID", length = 64, unique = true)
     @NotNull
     @Size(max = 64)
-    private String userId;
+    private String userId; // TODO : Long으로 바꿔줘야함
 
     @Column(name = "USERNAME", length = 100)
     @NotNull

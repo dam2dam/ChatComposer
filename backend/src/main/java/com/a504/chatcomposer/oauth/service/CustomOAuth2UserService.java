@@ -45,6 +45,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, user.getAttributes());
         User savedUser = userRepository.findByUserId(userInfo.getId());
 
+        System.out.println("로그인한 유저 정보 : "+user.getAttributes());
+
+
         if (savedUser != null) {
             if (providerType != savedUser.getProviderType()) {
                 throw new OAuthProviderMissMatchException(
@@ -60,10 +63,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return UserPrincipal.create(savedUser, user.getAttributes());
     }
 
+    /**
+     * @param userInfo 생성할 유저의 정보
+     * @return 유저를 DB에 저장하고 반환
+     */
     private User createUser(OAuth2UserInfo userInfo, ProviderType providerType) {
         LocalDateTime now = LocalDateTime.now();
         User user = new User(
-                userInfo.getId(),
+                userInfo.getId(), // TODO : userInfo에 있는 String을 Long으로 바꿔줘야함.
                 userInfo.getName(),
                 userInfo.getEmail(),
                 "Y",
