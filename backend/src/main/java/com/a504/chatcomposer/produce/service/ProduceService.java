@@ -12,6 +12,8 @@ public interface ProduceService {
     // 앨범 커버 이미지 생성
     FileUrlResp createCover(String coverRequest) throws IOException, InterruptedException;
     // 앨범 커버 이미지 저장
-    String saveCover(MultipartFileReq multipartFileReq);
+    String saveCover(MultipartFileReq image);
+    // 원본 음악 파일 저장
+    String saveMIDI(MultipartFileReq image);
 
 }

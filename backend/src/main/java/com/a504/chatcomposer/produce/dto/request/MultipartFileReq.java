@@ -12,5 +12,5 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @Builder
 public class MultipartFileReq {
-    private MultipartFile image;
+    private MultipartFile file;
 }

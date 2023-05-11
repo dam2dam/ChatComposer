@@ -116,15 +116,28 @@ public class ProduceServiceImpl implements ProduceService {
 
     @Transactional
     @Override
-    public String saveCover(MultipartFileReq multipartFileReq) {
+    public String saveCover(MultipartFileReq image) {
         // S3에 이미지 등록
-        MultipartFile multipartFile = multipartFileReq.getImage();
-        System.out.println(multipartFile.getOriginalFilename()+"11111111111111");
+        MultipartFile multipartFile = image.getFile();
         String img;
         try {
             img = s3Uploader.upload(multipartFile, "album");
         } catch (IOException e) {
             throw new IllegalArgumentException("앨범 커버 저장에 실패했습니다.");
+        }
+        LOGGER.info("================url===============\n" + img);
+        return img;
+    }
+
+    @Override
+    public String saveMIDI(MultipartFileReq file) {
+        // S3에 이미지 등록
+        MultipartFile multipartFile = file.getFile();
+        String img;
+        try {
+            img = s3Uploader.upload(multipartFile, "origin-music");
+        } catch (IOException e) {
+            throw new IllegalArgumentException("원본 음악 저장에 실패했습니다.");
         }
         LOGGER.info("================url===============\n" + img);
         return img;
