@@ -2,6 +2,7 @@ package com.a504.chatcomposer.produce.service;
 
 import com.a504.chatcomposer.global.util.S3Uploader;
 import com.a504.chatcomposer.produce.dto.request.MultipartFileReq;
+import com.a504.chatcomposer.produce.dto.request.OriginalMusicReq;
 import com.a504.chatcomposer.produce.dto.response.FileUrlResp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +69,47 @@ public class ProduceServiceImpl implements ProduceService {
 //
 //        return coverUrlResp;
 //    }
+
+    @Override
+    public byte[] createMusic(OriginalMusicReq originalMusicReq) throws IOException, InterruptedException {
+        // Generate correlation ID
+        String correlationId = UUID.randomUUID().toString();
+
+        // Convert CoverUrlResp object to byte array
+        ObjectMapper objectMapper = new ObjectMapper();
+        byte[] body = objectMapper.writeValueAsBytes(originalMusicReq);
+
+        //unique Queue create
+        String replyQueueName = "response.queue";
+
+        //properties setting
+        AMQP.BasicProperties props = new AMQP.BasicProperties
+                .Builder()
+                .correlationId(correlationId)
+                .replyTo(replyQueueName)
+                .build();
+
+        //Send Request
+        channel.basicPublish("music.exchange", "riffusion.key", props, body);
+
+        //차단하는 Queue... correlationId 이 다르면 차단
+        final BlockingQueue<byte[]> response = new ArrayBlockingQueue<>(1);
+
+        DeliverCallback callback = (consumerTag, delivery) -> {
+            //되받은 메세지에 담긴 correlationId를 요청보낸 correlationId와 대조
+            if(delivery.getProperties().getCorrelationId().equals(correlationId)){
+                response.offer(delivery.getBody());
+            }
+        };
+
+        String ctag = channel.basicConsume(replyQueueName, true, callback, consumerTag -> {});
+        byte[] originalMusic = response.take();
+        channel.basicCancel(ctag);
+
+        LOGGER.info("====ctag====\n" + ctag + "====response.take()====\n" + new String(originalMusic, "UTF-8"));
+
+        return originalMusic;
+    }
 
     @Override
     public FileUrlResp createCover(String coverRequest) throws IOException, InterruptedException {
