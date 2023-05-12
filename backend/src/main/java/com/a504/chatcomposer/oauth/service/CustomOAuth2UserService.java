@@ -70,7 +70,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private User createUser(OAuth2UserInfo userInfo, ProviderType providerType) {
         LocalDateTime now = LocalDateTime.now();
         User user = new User(
-                userInfo.getId(), // TODO : userInfo에 있는 String을 Long으로 바꿔줘야함.
+                userInfo.getId(),
                 userInfo.getName(),
                 userInfo.getEmail(),
                 "Y",
@@ -85,8 +85,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User updateUser(User user, OAuth2UserInfo userInfo) {
-        if (userInfo.getName() != null && !user.getUsername().equals(userInfo.getName())) {
-            user.setUsername(userInfo.getName());
+        if (userInfo.getName() != null && !user.getNickname().equals(userInfo.getName())) {
+            user.setNickname(userInfo.getName());
         }
 
         if (userInfo.getImageUrl() != null && !user.getProfileImageUrl().equals(userInfo.getImageUrl())) {

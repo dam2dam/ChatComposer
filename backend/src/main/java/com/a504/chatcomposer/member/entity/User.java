@@ -29,12 +29,12 @@ public class User {
     @Column(name = "USER_ID", length = 64, unique = true)
     @NotNull
     @Size(max = 64)
-    private String userId; // TODO : Long으로 바꿔줘야함
+    private String userId;
 
-    @Column(name = "USERNAME", length = 100)
+    @Column(name = "NICKNAME", length = 100)
     @NotNull
     @Size(max = 100)
-    private String username;
+    private String nickname;
 
     @JsonIgnore
     @Column(name = "PASSWORD", length = 128)
@@ -77,7 +77,7 @@ public class User {
 
     public User(
             @NotNull @Size(max = 64) String userId,
-            @NotNull @Size(max = 100) String username,
+            @NotNull @Size(max = 100) String nickname,
             @NotNull @Size(max = 512) String email,
             @NotNull @Size(max = 1) String emailVerifiedYn,
             @NotNull @Size(max = 512) String profileImageUrl,
@@ -87,7 +87,7 @@ public class User {
             @NotNull LocalDateTime modifiedAt
     ) {
         this.userId = userId;
-        this.username = username;
+        this.nickname = nickname;
         this.password = "NO_PASS";
         this.email = email != null ? email : "NO_EMAIL";
         this.emailVerifiedYn = emailVerifiedYn;
