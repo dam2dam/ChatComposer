@@ -12,6 +12,7 @@ import com.a504.chatcomposer.oauth.entity.UserPrincipal;
 import com.a504.chatcomposer.oauth.token.AuthToken;
 import com.a504.chatcomposer.oauth.token.AuthTokenProvider;
 import io.jsonwebtoken.Claims;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
+@Tag(name = "AuthController", description = "소셜로그인 API Document")
 @RestController
 @RequestMapping("/v1/auth")
 @RequiredArgsConstructor

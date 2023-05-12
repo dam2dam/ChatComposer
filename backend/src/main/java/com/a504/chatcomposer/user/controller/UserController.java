@@ -8,6 +8,7 @@ import com.a504.chatcomposer.oauth.token.AuthToken;
 import com.a504.chatcomposer.oauth.token.AuthTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
+@Tag(name = "UserController", description = "사용자 API Document")
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
