@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.a504.chatcomposer.member.entity.User;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
@@ -43,7 +44,7 @@ public class MusicDetailResp {
 	private long musicId;
 
 	@Schema(description = "작성자 정보")
-	private Member member;
+	private User user;
 
 	@Schema(description = "음악 제목")
 	private String title;
@@ -108,10 +109,10 @@ public class MusicDetailResp {
 		this.favoriteCount = music.getFavoriteCount();
 
 		// 작성자 정보
-		this.member = Member.builder()
-			.memberId(memberId)
-			.nickname(nickname)
-			.build();
+		this.user = User.builder()
+				.userSeq(memberId)
+				.nickname(nickname)
+				.build();
 
 		// music tags -> tag name 리스트로 만들기
 		this.tags = music.getMusicTags().stream()
@@ -148,7 +149,8 @@ public class MusicDetailResp {
 		// 누군가 좋아요 한 음악이고 로그인 된 요청이라면 음악 좋아요 여부 판단
 		if (!CollectionUtils.isEmpty(favoriteMusics) && loginUserId != NOT_LOGIN) {
 			for (int i = 0; i < favoriteMusics.size(); i++) {
-				if (favoriteMusics.get(i).getMember().getId().equals(loginUserId)) {
+//				if (favoriteMusics.get(i).getMember().getId().equals(loginUserId)) {
+				if (favoriteMusics.get(i).getUser().getUserSeq().equals(loginUserId)) {
 					isMyFavorite = YES;
 					break;
 				}

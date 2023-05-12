@@ -30,8 +30,8 @@ public class UserController {
     private String MASTER_ID;
     @GetMapping
     public ApiResponse getUser() {
+        // principal에서 토큰 정보를 받아올 수 있음!
         org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         User user = userService.getUser(principal.getUsername());
 
         return ApiResponse.success("user", user);

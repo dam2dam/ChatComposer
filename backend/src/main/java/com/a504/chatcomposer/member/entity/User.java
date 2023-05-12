@@ -1,22 +1,23 @@
 package com.a504.chatcomposer.member.entity;
 
+import com.a504.chatcomposer.music.entity.Music;
 import com.a504.chatcomposer.oauth.entity.ProviderType;
 import com.a504.chatcomposer.oauth.entity.RoleType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "USER")
 public class User {
@@ -74,6 +75,15 @@ public class User {
     @Column(name = "MODIFIED_AT")
     @NotNull
     private LocalDateTime modifiedAt;
+
+    @OneToMany(mappedBy = "user")
+    private List<FavoriteGenre> favoriteGenres = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<FavoriteMusic> favoriteMusics = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Music> musics = new ArrayList<>();
 
     public User(
             @NotNull @Size(max = 64) String userId,

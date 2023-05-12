@@ -47,7 +47,6 @@ public class MusicController {
 
 		// TODO: 로그인 유저 정보 (member pk) 사용 (Nullable)
 		Long loginUserId = 1L;
-		// Long loginUserId = null;
 
 		List<MusicsResp> musicsResps = musicService.getMusicList(genre, tag, nickname, title, isMyFavorite,
 			loginUserId);

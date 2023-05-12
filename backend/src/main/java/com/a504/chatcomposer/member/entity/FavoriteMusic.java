@@ -34,8 +34,8 @@ public class FavoriteMusic {
 
 	@NotNull
 	@ManyToOne
-	@JoinColumn(name = "member_id")
-	private Member member;
+	@JoinColumn(name = "user_seq")
+	private User user;
 
 	@NotNull
 	@ManyToOne

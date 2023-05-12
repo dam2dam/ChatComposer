@@ -36,8 +36,8 @@ public class FavoriteGenre {
 
 	@NotNull
 	@ManyToOne
-	@JoinColumn(name = "member_id")
-	private Member member;
+	@JoinColumn(name = "user_seq")
+	private User user;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
