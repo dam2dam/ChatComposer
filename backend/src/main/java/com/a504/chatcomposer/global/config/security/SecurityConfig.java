@@ -93,7 +93,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                     .antMatchers(HttpMethod.GET,"/musics/**").permitAll()
                     .antMatchers(HttpMethod.GET,"/musics/**").permitAll()
-                    .antMatchers("/v1/users/access").permitAll()
+                    .antMatchers("/users/access").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .oauth2Login()
