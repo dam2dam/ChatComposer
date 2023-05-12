@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public interface ProduceService {
     // 믹싱 음악 생성
-    byte[] createMusic(OriginalMusicReq originalMusicReq) throws IOException, InterruptedException;
+    byte[] createMusic(String musicSource, String prompt) throws IOException, InterruptedException;
     // 앨범 커버 이미지 생성
     byte[] createCover(String coverRequest) throws IOException, InterruptedException;
     // 앨범 커버 이미지 저장

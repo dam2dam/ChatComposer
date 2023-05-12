@@ -1,6 +1,7 @@
 package com.a504.chatcomposer.produce.service;
 
 import com.a504.chatcomposer.global.util.S3Uploader;
+import com.a504.chatcomposer.produce.dto.request.MixedMusicReq;
 import com.a504.chatcomposer.produce.dto.request.MultipartFileReq;
 import com.a504.chatcomposer.produce.dto.request.OriginalMusicReq;
 import com.a504.chatcomposer.produce.dto.response.FileUrlResp;
@@ -29,13 +30,13 @@ public class ProduceServiceImpl implements ProduceService {
     private final RabbitTemplate rabbitTemplate;
 
     @Override
-    public byte[] createMusic(OriginalMusicReq originalMusicReq) throws IOException, InterruptedException {
+    public byte[] createMusic(String musicSource, String prompt) throws IOException, InterruptedException {
         // Generate correlation ID
         String correlationId = UUID.randomUUID().toString();
 
         // Convert CoverUrlResp object to byte array
         ObjectMapper objectMapper = new ObjectMapper();
-        byte[] body = objectMapper.writeValueAsBytes(originalMusicReq);
+        byte[] body = objectMapper.writeValueAsBytes(MixedMusicReq.of(musicSource, prompt));
 
         //unique Queue create
         String replyQueueName = "response.queue";
