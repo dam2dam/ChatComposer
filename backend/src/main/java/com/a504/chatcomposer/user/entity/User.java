@@ -1,4 +1,4 @@
-package com.a504.chatcomposer.member.entity;
+package com.a504.chatcomposer.user.entity;
 
 import com.a504.chatcomposer.music.entity.Music;
 import com.a504.chatcomposer.oauth.entity.ProviderType;

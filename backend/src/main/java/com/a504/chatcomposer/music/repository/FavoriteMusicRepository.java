@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.a504.chatcomposer.member.entity.FavoriteMusic;
+import com.a504.chatcomposer.user.entity.FavoriteMusic;
 
 @Repository
 public interface FavoriteMusicRepository extends JpaRepository<FavoriteMusic, Long> {

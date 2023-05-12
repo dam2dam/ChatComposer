@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
-import com.a504.chatcomposer.member.entity.FavoriteMusic;
+import com.a504.chatcomposer.user.entity.FavoriteMusic;
 import com.a504.chatcomposer.music.dto.Member;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 import com.a504.chatcomposer.music.entity.Music;

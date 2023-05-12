@@ -1,7 +1,9 @@
-package com.a504.chatcomposer.member.entity;
+package com.a504.chatcomposer.user.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -10,7 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.a504.chatcomposer.music.entity.Music;
+import com.a504.chatcomposer.music.dto.enums.Genre;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,12 +26,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "favorite_music")
-public class FavoriteMusic {
+@Table(name = "favorite_genre")
+public class FavoriteGenre {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "favorite_music_id", nullable = false)
+	@Column(name = "favorite_genre_id", nullable = false)
 	private Long id;
 
 	@NotNull
@@ -38,8 +40,8 @@ public class FavoriteMusic {
 	private User user;
 
 	@NotNull
-	@ManyToOne
-	@JoinColumn(name = "music_id")
-	private Music music;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "genre")
+	private Genre genre;
 
 }

@@ -1,12 +1,12 @@
-package com.a504.chatcomposer.member.controller;
+package com.a504.chatcomposer.user.controller;
 
 import com.a504.chatcomposer.global.common.ApiResponse;
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.global.util.CookieUtil;
 import com.a504.chatcomposer.global.util.HeaderUtil;
-import com.a504.chatcomposer.member.entity.AuthReqModel;
-import com.a504.chatcomposer.member.entity.UserRefreshToken;
-import com.a504.chatcomposer.member.repository.UserRefreshTokenRepository;
+import com.a504.chatcomposer.user.entity.AuthReqModel;
+import com.a504.chatcomposer.user.entity.UserRefreshToken;
+import com.a504.chatcomposer.user.repository.UserRefreshTokenRepository;
 import com.a504.chatcomposer.oauth.entity.RoleType;
 import com.a504.chatcomposer.oauth.entity.UserPrincipal;
 import com.a504.chatcomposer.oauth.token.AuthToken;

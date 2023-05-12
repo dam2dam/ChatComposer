@@ -2,8 +2,7 @@ package com.a504.chatcomposer.global.config.security;
 
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.global.config.properties.CorsProperties;
-import com.a504.chatcomposer.member.repository.UserRefreshTokenRepository;
-import com.a504.chatcomposer.oauth.entity.RoleType;
+import com.a504.chatcomposer.user.repository.UserRefreshTokenRepository;
 import com.a504.chatcomposer.oauth.exception.RestAuthenticationEntryPoint;
 import com.a504.chatcomposer.oauth.filter.TokenAuthenticationFilter;
 import com.a504.chatcomposer.oauth.handler.OAuth2AuthenticationFailureHandler;

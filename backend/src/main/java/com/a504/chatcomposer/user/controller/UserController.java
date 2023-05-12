@@ -1,9 +1,9 @@
-package com.a504.chatcomposer.member.controller;
+package com.a504.chatcomposer.user.controller;
 
 import com.a504.chatcomposer.global.common.ApiResponse;
 import com.a504.chatcomposer.global.config.properties.AppProperties;
-import com.a504.chatcomposer.member.entity.User;
-import com.a504.chatcomposer.member.service.UserService;
+import com.a504.chatcomposer.user.entity.User;
+import com.a504.chatcomposer.user.service.UserService;
 import com.a504.chatcomposer.oauth.token.AuthToken;
 import com.a504.chatcomposer.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 @RestController

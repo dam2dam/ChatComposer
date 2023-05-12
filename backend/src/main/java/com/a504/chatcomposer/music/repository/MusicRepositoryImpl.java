@@ -4,12 +4,12 @@ import static com.a504.chatcomposer.global.util.Utils.*;
 
 import java.util.List;
 
-import com.a504.chatcomposer.member.entity.QUser;
+import com.a504.chatcomposer.user.entity.QUser;
 import org.springframework.util.StringUtils;
 
 import com.a504.chatcomposer.global.exception.CustomException;
 import com.a504.chatcomposer.global.exception.CustomExceptionType;
-import com.a504.chatcomposer.member.entity.QFavoriteMusic;
+import com.a504.chatcomposer.user.entity.QFavoriteMusic;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 import com.a504.chatcomposer.music.dto.response.MusicDetailResp;
 import com.a504.chatcomposer.music.dto.response.MusicsResp;

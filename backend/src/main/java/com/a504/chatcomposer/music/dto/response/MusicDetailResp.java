@@ -7,12 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.a504.chatcomposer.member.entity.User;
+import com.a504.chatcomposer.user.entity.User;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
-import com.a504.chatcomposer.member.entity.FavoriteMusic;
-import com.a504.chatcomposer.music.dto.Member;
+import com.a504.chatcomposer.user.entity.FavoriteMusic;
 import com.a504.chatcomposer.music.dto.Prompt;
 import com.a504.chatcomposer.music.dto.Track;
 import com.a504.chatcomposer.music.dto.enums.Beat;

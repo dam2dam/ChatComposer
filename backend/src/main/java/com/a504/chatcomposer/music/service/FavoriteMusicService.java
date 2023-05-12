@@ -1,13 +1,13 @@
 package com.a504.chatcomposer.music.service;
 
-import com.a504.chatcomposer.member.entity.User;
-import com.a504.chatcomposer.member.repository.UserRepository;
+import com.a504.chatcomposer.user.entity.User;
+import com.a504.chatcomposer.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.a504.chatcomposer.global.exception.CustomException;
 import com.a504.chatcomposer.global.exception.CustomExceptionType;
-import com.a504.chatcomposer.member.entity.FavoriteMusic;
+import com.a504.chatcomposer.user.entity.FavoriteMusic;
 import com.a504.chatcomposer.music.entity.Music;
 import com.a504.chatcomposer.music.repository.FavoriteMusicRepository;
 import com.a504.chatcomposer.music.repository.MusicRepository;
