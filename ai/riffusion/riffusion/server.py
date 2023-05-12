@@ -27,6 +27,7 @@ from riffusion.datatypes import InferenceInput, InferenceOutput, RiffusionInput,
 from riffusion.riffusion_pipeline import RiffusionPipeline
 from riffusion.spectrogram_image_converter import SpectrogramImageConverter
 from riffusion.spectrogram_params import SpectrogramParams
+from riffusion.util import audio_util
 from riffusion.util import base64_util
 
 # Flask app with CORS
@@ -121,58 +122,106 @@ def compute_riff_request(
     # input_wav = download_wav(inputs.url)
     segment = download_local_wav()
 
-    # variables from audio_to_audio_batch.py
-    clip_start_time_s = 0.0
+    # variables from audio_to_audio.py
+    start_time_s = 0.0
     clip_duration_s = 20.0
+    overlap_duration_s = 0.5
     batches = 1
 
-    clip_start_time_ms = int(clip_start_time_s * 1000)
-    clip_duration_ms = int(clip_duration_s * 1000)
-    clip_segment: pydub.AudioSegment = segment[clip_start_time_ms: clip_start_time_ms + clip_duration_ms]
+    duration_s = min(clip_duration_s, segment.duration_seconds - start_time_s)
+    increment_s = clip_duration_s - overlap_duration_s
+    clip_start_times = start_time_s + np.arange(0, duration_s - clip_duration_s, increment_s)    # spectorgram 
 
-    # spectorgram 
-    params = SpectrogramParams()
+    # prompt_input_a = PromptInput(
+    #     prompt=prompt,
+    #     seed=seed,
+    #     guidance=guidance,
+    # )
 
-    init_image: Image.Image = server_util.spectrogram_image_from_audio(
-        clip_segment,
-        params=params,
-        device="cuda",
+    # use magic_mix
+    prompt = inputs.prompt
+    seed = randint(10, 100000)      
+
+    magic_mix_kmin = 0.6
+    magic_mix_kmax = 0.9
+    magic_mix_mix_factor = 0.5
+
+    clip_segments = server_util.slice_audio_into_clips(
+        segment=segment,
+        clip_start_times=clip_start_times,
+        clip_duration_s=clip_duration_s,
     )
-    closest_width = int(np.ceil(init_image.width / 32) * 32)
-    closest_height = int(np.ceil(init_image.height / 32) * 32)
-    init_image_resized = init_image.resize((closest_width, closest_height), Image.BICUBIC)
+
+    params = SpectrogramParams(
+        min_frequency=0,
+        max_frequency=10000,
+        stereo=False,
+    )
 
     # inference params
     denoising_strength = 0.7
     guidance_scale = 7.0
     num_inference_steps = 50
+    scheduler="DPMSolverMultistepScheduler"
+    device="cuda"
+    # 모델 경로 잡아야 됨
+    checkpoint="riffusion-model"
 
-    seed = randint(10, 100000)
+    result_images: T.List[Image.Image] = []
+    result_segments: T.List[pydub.AudioSegment] = []
 
-    result_image: Image.Image = server_util.run_img2img(
-        prompt=inputs.prompt,
-        init_image=init_image_resized,
-        denoising_strength=denoising_strength,
-        num_inference_steps=num_inference_steps,
-        guidance_scale=guidance_scale,
-        negative_prompt="",
-        seed=seed,
-        device="cuda",
-    )    
-    # Resize back to original size
-    result_image = result_image.resize(init_image.size, Image.BICUBIC)
-    
-    riffed_segment: pydub.AudioSegment = server_util.audio_segment_from_spectrogram_image(
-        image=result_image,
-        params=params,
-        device="cuda",
-    )
+    for i, clip_segment in enumerate(clip_segments):
+        audio_bytes = io.BytesIO()
+        clip_segment.export(audio_bytes, format="wav")
+        init_image: Image.Image = server_util.spectrogram_image_from_audio(
+            clip_segment,
+            params=params,
+            device="cuda",
+        )
+
+        init_image_resized = server_util.scale_image_to_32_stride(init_image)
+        image = server_util.run_img2img_magic_mix(
+            prompt=prompt,
+            init_image=init_image_resized,
+            num_inference_steps=num_inference_steps,
+            guidance_scale=guidance_scale,
+            seed=seed,
+            kmin=magic_mix_kmin,
+            kmax=magic_mix_kmax,
+            mix_factor=magic_mix_mix_factor,
+            device=device,
+            scheduler=scheduler,
+            checkpoint=checkpoint,
+        )
+
+        # Resize back to original size
+        image = image.resize(init_image.size, Image.BICUBIC)
+
+        result_images.append(image)
+
+        riffed_segment = server_util.audio_segment_from_spectrogram_image(
+            image=image,
+            params=params,
+            device=device,
+        )
+        result_segments.append(riffed_segment)
+
+        audio_bytes = io.BytesIO()
+        riffed_segment.export(audio_bytes, format="wav")
+
+    # Combine clips with a crossfade based on overlap
+    combined_segment = audio_util.stitch_segments(result_segments, crossfade_s=overlap_duration_s)
 
     audio_bytes = io.BytesIO()
     riffed_segment.export(audio_bytes, format="mp3")
+    audio_bytes.seek(0)  # Move the file pointer to the beginning of the file
 
-    return flask.send_file('audio.mp3', mimetype='audio/mp3')
+    # Assemble the output dataclass
+    output = InferenceOutput(
+        audio=audio_bytes
+    )
 
+    return json.dumps(dataclasses.asdict(output))
 
 def download_wav(url: str):
     # fetch the file contents using the requests library

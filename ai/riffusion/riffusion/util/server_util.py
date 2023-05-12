@@ -111,6 +111,14 @@ def spectrogram_image_converter(
     return SpectrogramImageConverter(params=params, device=device)
 
 
+def spectrogram_image_from_audio(
+    segment: pydub.AudioSegment,
+    params: SpectrogramParams,
+    device: str = "cuda",
+) -> Image.Image:
+    converter = spectrogram_image_converter(params=params, device=device)
+    return converter.spectrogram_image_from_audio(segment)
+
 def get_scheduler(scheduler: str, config: T.Any) -> T.Any:
     """
     Construct a denoising scheduler from a string.
@@ -142,6 +150,46 @@ def get_scheduler(scheduler: str, config: T.Any) -> T.Any:
     else:
         raise ValueError(f"Unknown scheduler {scheduler}")
     
+def audio_segment_from_spectrogram_image(
+    image: Image.Image,
+    params: SpectrogramParams,
+    device: str = "cuda",
+) -> pydub.AudioSegment:
+    converter = spectrogram_image_converter(params=params, device=device)
+    return converter.audio_from_spectrogram_image(image)
+
+
+def slice_audio_into_clips(
+    segment: pydub.AudioSegment, clip_start_times: T.Sequence[float], clip_duration_s: float
+) -> T.List[pydub.AudioSegment]:
+    """
+    Slice an audio segment into a list of clips of a given duration at the given start times.
+    """
+    clip_segments: T.List[pydub.AudioSegment] = []
+    for i, clip_start_time_s in enumerate(clip_start_times):
+        clip_start_time_ms = int(clip_start_time_s * 1000)
+        clip_duration_ms = int(clip_duration_s * 1000)
+        clip_segment = segment[clip_start_time_ms : clip_start_time_ms + clip_duration_ms]
+
+        # TODO(hayk): I don't think this is working properly
+        if i == len(clip_start_times) - 1:
+            silence_ms = clip_duration_ms - int(clip_segment.duration_seconds * 1000)
+            if silence_ms > 0:
+                clip_segment = clip_segment.append(pydub.AudioSegment.silent(duration=silence_ms))
+
+        clip_segments.append(clip_segment)
+
+    return clip_segments
+
+def scale_image_to_32_stride(image: Image.Image) -> Image.Image:
+    """
+    Scale an image to a size that is a multiple of 32.
+    """
+    closest_width = int(np.ceil(image.width / 32) * 32)
+    closest_height = int(np.ceil(image.height / 32) * 32)
+    return image.resize((closest_width, closest_height), Image.BICUBIC)
+
+
 def audio_segment_from_spectrogram_image(
     image: Image.Image,
     params: SpectrogramParams,
