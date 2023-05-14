@@ -1,7 +1,7 @@
 package com.a504.chatcomposer.oauth.service;
 
-import com.a504.chatcomposer.member.entity.User;
-import com.a504.chatcomposer.member.repository.UserRepository;
+import com.a504.chatcomposer.user.entity.User;
+import com.a504.chatcomposer.user.repository.UserRepository;
 import com.a504.chatcomposer.oauth.entity.ProviderType;
 import com.a504.chatcomposer.oauth.entity.RoleType;
 import com.a504.chatcomposer.oauth.entity.UserPrincipal;
@@ -45,6 +45,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, user.getAttributes());
         User savedUser = userRepository.findByUserId(userInfo.getId());
 
+        System.out.println("로그인한 유저 정보 : "+user.getAttributes());
+
+
         if (savedUser != null) {
             if (providerType != savedUser.getProviderType()) {
                 throw new OAuthProviderMissMatchException(
@@ -60,6 +63,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return UserPrincipal.create(savedUser, user.getAttributes());
     }
 
+    /**
+     * @param userInfo 생성할 유저의 정보
+     * @return 유저를 DB에 저장하고 반환
+     */
     private User createUser(OAuth2UserInfo userInfo, ProviderType providerType) {
         LocalDateTime now = LocalDateTime.now();
         User user = new User(
@@ -78,8 +85,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User updateUser(User user, OAuth2UserInfo userInfo) {
-        if (userInfo.getName() != null && !user.getUsername().equals(userInfo.getName())) {
-            user.setUsername(userInfo.getName());
+        if (userInfo.getName() != null && !user.getNickname().equals(userInfo.getName())) {
+            user.setNickname(userInfo.getName());
         }
 
         if (userInfo.getImageUrl() != null && !user.getProfileImageUrl().equals(userInfo.getImageUrl())) {

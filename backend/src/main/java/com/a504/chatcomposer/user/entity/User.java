@@ -1,22 +1,23 @@
-package com.a504.chatcomposer.member.entity;
+package com.a504.chatcomposer.user.entity;
 
+import com.a504.chatcomposer.music.entity.Music;
 import com.a504.chatcomposer.oauth.entity.ProviderType;
 import com.a504.chatcomposer.oauth.entity.RoleType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "USER")
 public class User {
@@ -31,10 +32,10 @@ public class User {
     @Size(max = 64)
     private String userId;
 
-    @Column(name = "USERNAME", length = 100)
+    @Column(name = "NICKNAME", length = 100)
     @NotNull
     @Size(max = 100)
-    private String username;
+    private String nickname;
 
     @JsonIgnore
     @Column(name = "PASSWORD", length = 128)
@@ -75,9 +76,18 @@ public class User {
     @NotNull
     private LocalDateTime modifiedAt;
 
+    @OneToMany(mappedBy = "user")
+    private List<FavoriteGenre> favoriteGenres = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<FavoriteMusic> favoriteMusics = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Music> musics = new ArrayList<>();
+
     public User(
             @NotNull @Size(max = 64) String userId,
-            @NotNull @Size(max = 100) String username,
+            @NotNull @Size(max = 100) String nickname,
             @NotNull @Size(max = 512) String email,
             @NotNull @Size(max = 1) String emailVerifiedYn,
             @NotNull @Size(max = 512) String profileImageUrl,
@@ -87,7 +97,7 @@ public class User {
             @NotNull LocalDateTime modifiedAt
     ) {
         this.userId = userId;
-        this.username = username;
+        this.nickname = nickname;
         this.password = "NO_PASS";
         this.email = email != null ? email : "NO_EMAIL";
         this.emailVerifiedYn = emailVerifiedYn;

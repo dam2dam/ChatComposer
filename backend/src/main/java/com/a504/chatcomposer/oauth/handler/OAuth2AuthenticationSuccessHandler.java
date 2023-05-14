@@ -2,8 +2,8 @@ package com.a504.chatcomposer.oauth.handler;
 
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.global.util.CookieUtil;
-import com.a504.chatcomposer.member.entity.UserRefreshToken;
-import com.a504.chatcomposer.member.repository.UserRefreshTokenRepository;
+import com.a504.chatcomposer.user.entity.UserRefreshToken;
+import com.a504.chatcomposer.user.repository.UserRefreshTokenRepository;
 import com.a504.chatcomposer.oauth.entity.ProviderType;
 import com.a504.chatcomposer.oauth.entity.RoleType;
 import com.a504.chatcomposer.oauth.info.OAuth2UserInfo;

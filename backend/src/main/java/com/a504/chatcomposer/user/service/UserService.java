@@ -1,7 +1,7 @@
-package com.a504.chatcomposer.member.service;
+package com.a504.chatcomposer.user.service;
 
-import com.a504.chatcomposer.member.entity.User;
-import com.a504.chatcomposer.member.repository.UserRepository;
+import com.a504.chatcomposer.user.entity.User;
+import com.a504.chatcomposer.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,5 +12,9 @@ public class UserService {
 
     public User getUser(String userId) {
         return userRepository.findByUserId(userId);
+    }
+
+    public Long getUserSeq(String userId) {
+        return userRepository.findByUserId(userId).getUserSeq();
     }
 }

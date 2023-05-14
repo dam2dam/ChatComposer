@@ -2,8 +2,7 @@ package com.a504.chatcomposer.global.config.security;
 
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.global.config.properties.CorsProperties;
-import com.a504.chatcomposer.member.repository.UserRefreshTokenRepository;
-import com.a504.chatcomposer.oauth.entity.RoleType;
+import com.a504.chatcomposer.user.repository.UserRefreshTokenRepository;
 import com.a504.chatcomposer.oauth.exception.RestAuthenticationEntryPoint;
 import com.a504.chatcomposer.oauth.filter.TokenAuthenticationFilter;
 import com.a504.chatcomposer.oauth.handler.OAuth2AuthenticationFailureHandler;
@@ -94,7 +93,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                     .antMatchers(HttpMethod.GET,"/musics/**").permitAll()
                     .antMatchers(HttpMethod.GET,"/musics/**").permitAll()
-                    .antMatchers("/v1/users/access").permitAll()
+                    .antMatchers("/users/access").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .oauth2Login()
@@ -153,7 +152,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     * */
     @Bean
     public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
-        System.out.println("SuccessHandler 메소드 호출.");
         return new OAuth2AuthenticationSuccessHandler(
                 tokenProvider,
                 appProperties,
@@ -167,7 +165,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * */
     @Bean
     public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
-        System.out.println("FailureHandler 메소드 호출.");
         return new OAuth2AuthenticationFailureHandler(oAuth2AuthorizationRequestBasedOnCookieRepository());
     }
 
@@ -184,10 +181,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         corsConfig.setAllowedOrigins(Arrays.asList(corsProperties.getAllowedOrigins().split(",")));
         corsConfig.setAllowCredentials(true);
         corsConfig.setMaxAge(corsConfig.getMaxAge());
-
-        for (String s : Arrays.asList(corsProperties.getAllowedOrigins().split(","))) {
-            System.out.println(s);
-        }
 
         corsConfigSource.registerCorsConfiguration("/**", corsConfig);
         return corsConfigSource;

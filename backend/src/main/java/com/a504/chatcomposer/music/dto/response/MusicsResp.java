@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
-import com.a504.chatcomposer.member.entity.FavoriteMusic;
+import com.a504.chatcomposer.user.entity.FavoriteMusic;
 import com.a504.chatcomposer.music.dto.Member;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 import com.a504.chatcomposer.music.entity.Music;
@@ -89,7 +89,7 @@ public class MusicsResp {
 		// 누군가 좋아요 한 음악이고 로그인 된 요청이라면 음악 좋아요 여부 판단
 		if (!CollectionUtils.isEmpty(favoriteMusics) && loginUserId != NOT_LOGIN) {
 			for (int i = 0; i < favoriteMusics.size(); i++) {
-				if (favoriteMusics.get(i).getMember().getId().equals(loginUserId)) {
+				if (favoriteMusics.get(i).getUser().getUserSeq().equals(loginUserId)) {
 					isMyFavorite = YES;
 					break;
 				}

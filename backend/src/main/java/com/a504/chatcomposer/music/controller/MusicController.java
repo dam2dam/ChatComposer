@@ -2,7 +2,9 @@ package com.a504.chatcomposer.music.controller;
 
 import java.util.List;
 
+import com.a504.chatcomposer.user.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +33,7 @@ public class MusicController {
 
 	private final MusicService musicService;
 	private final FavoriteMusicService favoriteMusicService;
+	private final UserService userService;
 
 	@Operation(summary = "음악 리스트 조회", description = "필터 조건에 맞는 음악 리스트를 조회합니다.")
 	@ApiResponses(value = {
@@ -45,9 +48,8 @@ public class MusicController {
 		@RequestParam(required = false, value = "title") String title,
 		@RequestParam(required = false, value = "is-my-favorite") String isMyFavorite) {
 
-		// TODO: 로그인 유저 정보 (member pk) 사용 (Nullable)
-		Long loginUserId = 1L;
-		// Long loginUserId = null;
+		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long loginUserId = userService.getUserSeq(principal.getUsername());
 
 		List<MusicsResp> musicsResps = musicService.getMusicList(genre, tag, nickname, title, isMyFavorite,
 			loginUserId);
@@ -62,9 +64,8 @@ public class MusicController {
 	@GetMapping("/{music_id}")
 	public ResponseEntity<?> getMusicDetail(@PathVariable("music_id") Long musicId) {
 
-		// TODO: 로그인 유저 정보 (member pk) 사용 (Nullable)
-		Long loginUserId = 1L;
-		// Long loginUserId = null;
+		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long loginUserId = userService.getUserSeq(principal.getUsername());
 
 		MusicDetailResp musicDetailResp = musicService.getMusicDetail(musicId, loginUserId);
 		return ResponseEntity.ok().body(musicDetailResp);
@@ -78,8 +79,8 @@ public class MusicController {
 	@PostMapping("/{music_id}")
 	public ResponseEntity<?> createFavoriteMusic(@PathVariable("music_id") Long musicId) {
 
-		// TODO: 로그인 유저 정보 (member pk) 사용
-		Long loginUserId = 1L;
+		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long loginUserId = userService.getUserSeq(principal.getUsername());
 
 		favoriteMusicService.createFavoriteMusic(musicId, loginUserId);
 		return ResponseEntity.ok().body(new BaseResponseBody(200, "음악 좋아요를 추가했습니다."));
@@ -93,8 +94,8 @@ public class MusicController {
 	@DeleteMapping("/{music_id}")
 	public ResponseEntity<?> deleteFavoriteMusic(@PathVariable("music_id") Long musicId) {
 
-		// TODO: 로그인 유저 정보 (member pk) 사용
-		Long loginUserId = 1L;
+		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Long loginUserId = userService.getUserSeq(principal.getUsername());
 
 		favoriteMusicService.deleteFavoriteMusic(musicId, loginUserId);
 		return ResponseEntity.ok().body(new BaseResponseBody(200, "음악 좋아요를 취소했습니다."));

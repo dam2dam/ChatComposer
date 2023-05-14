@@ -1,6 +1,6 @@
-package com.a504.chatcomposer.member.repository;
+package com.a504.chatcomposer.user.repository;
 
-import com.a504.chatcomposer.member.entity.UserRefreshToken;
+import com.a504.chatcomposer.user.entity.UserRefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
 package com.a504.chatcomposer.oauth.entity;
 
-import com.a504.chatcomposer.member.entity.User;
+import com.a504.chatcomposer.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

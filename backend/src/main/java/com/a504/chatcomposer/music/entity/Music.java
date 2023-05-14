@@ -17,11 +17,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.a504.chatcomposer.user.entity.User;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.a504.chatcomposer.member.entity.FavoriteMusic;
-import com.a504.chatcomposer.member.entity.Member;
+import com.a504.chatcomposer.user.entity.FavoriteMusic;
 import com.a504.chatcomposer.music.dto.enums.Beat;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 
@@ -47,8 +47,8 @@ public class Music {
 
 	@NotNull
 	@ManyToOne
-	@JoinColumn(name = "member_id")
-	private Member member;
+	@JoinColumn(name = "user_seq")
+	private User user;
 
 	@Column(name = "title", length = 20)
 	private String title;

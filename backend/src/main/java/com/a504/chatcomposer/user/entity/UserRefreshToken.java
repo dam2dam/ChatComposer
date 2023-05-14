@@ -1,4 +1,4 @@
-package com.a504.chatcomposer.member.entity;
+package com.a504.chatcomposer.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.a504.chatcomposer.member.entity;
+package com.a504.chatcomposer.user.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,8 +34,8 @@ public class FavoriteMusic {
 
 	@NotNull
 	@ManyToOne
-	@JoinColumn(name = "member_id")
-	private Member member;
+	@JoinColumn(name = "user_seq")
+	private User user;
 
 	@NotNull
 	@ManyToOne

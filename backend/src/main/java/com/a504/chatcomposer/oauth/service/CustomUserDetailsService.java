@@ -1,7 +1,7 @@
 package com.a504.chatcomposer.oauth.service;
 
-import com.a504.chatcomposer.member.entity.User;
-import com.a504.chatcomposer.member.repository.UserRepository;
+import com.a504.chatcomposer.user.entity.User;
+import com.a504.chatcomposer.user.repository.UserRepository;
 import com.a504.chatcomposer.oauth.entity.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

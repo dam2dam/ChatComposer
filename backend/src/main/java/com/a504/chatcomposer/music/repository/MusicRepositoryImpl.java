@@ -4,13 +4,12 @@ import static com.a504.chatcomposer.global.util.Utils.*;
 
 import java.util.List;
 
+import com.a504.chatcomposer.user.entity.QUser;
 import org.springframework.util.StringUtils;
 
 import com.a504.chatcomposer.global.exception.CustomException;
 import com.a504.chatcomposer.global.exception.CustomExceptionType;
-import com.a504.chatcomposer.member.entity.QFavoriteMusic;
-import com.a504.chatcomposer.member.entity.QMember;
-import com.a504.chatcomposer.member.entity.QMemberProfile;
+import com.a504.chatcomposer.user.entity.QFavoriteMusic;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 import com.a504.chatcomposer.music.dto.response.MusicDetailResp;
 import com.a504.chatcomposer.music.dto.response.MusicsResp;
@@ -43,8 +42,7 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 	QTag tag = QTag.tag;
 	QTrack track = QTrack.track;
 	QPrompt prompt = QPrompt.prompt;
-	QMember member = QMember.member;
-	QMemberProfile memberProfile = QMemberProfile.memberProfile;
+	QUser user = QUser.user;
 
 	@Override
 	public List<MusicsResp> getMusicList(Integer genre, String tagName, String nickname, String title,
@@ -57,8 +55,8 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 			.select(new QMusicsResp(
 				Expressions.asNumber(isMember(loginUserId)).as("loginUserId"),
 				music,
-				music.member.id,
-				music.member.memberProfile.nickname)).distinct()
+				music.user.userSeq,
+				music.user.nickname)).distinct()
 			.from(music)
 			.leftJoin(music.musicTags, musicTag)
 			.leftJoin(musicTag.tag, tag)
@@ -97,12 +95,12 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 			.select(new QMusicDetailResp(
 				Expressions.asNumber(isMember(loginUserId)).as("loginUserId"),
 				music,
-				member.id,
-				memberProfile.nickname
+				user.userSeq,
+				user.nickname
 			))
 			.from(music)
-			.leftJoin(music.member, member)
-			.leftJoin(member.memberProfile, memberProfile)
+			.leftJoin(music.user, user)
+//			.leftJoin(member.memberProfile, memberProfile)
 			.leftJoin(music.tracks, track)
 			.leftJoin(track.prompt, prompt)
 			.leftJoin(music.musicTags, musicTag)
@@ -142,7 +140,7 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 	 * @return member_profile.nickname like ? escape '!', or null
 	 */
 	private BooleanExpression nicknameContains(String nickname) {
-		return StringUtils.hasText(nickname) ? music.member.memberProfile.nickname.contains(nickname) : null;
+		return StringUtils.hasText(nickname) ? music.user.nickname.contains(nickname) : null;
 	}
 
 	/**
@@ -156,7 +154,7 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 	 * @return favorite_music.member_id=?, or null
 	 */
 	private BooleanExpression isLikedEq(String isMyFavorite, Long loginUserId) {
-		return StringUtils.hasText(isMyFavorite) && isMyFavorite.equals(YES) ? favoriteMusic.member.id.eq(loginUserId) :
+		return StringUtils.hasText(isMyFavorite) && isMyFavorite.equals(YES) ? favoriteMusic.user.userSeq.eq(loginUserId) :
 			null;
 	}
 }
