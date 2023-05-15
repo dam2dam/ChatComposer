@@ -8,5 +8,5 @@ import com.a504.chatcomposer.tag.entity.Tag;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
-	Optional<Tag> findByTagNameLike(String tagName);
+	Optional<Tag> findByTagName(String tagName);
 }

@@ -26,7 +26,7 @@ public class TagService {
 	 */
 	public void createTag(String tagName) {
 
-		Tag existTag = tagRepository.findByTagNameLike(tagName).orElse(null);
+		Tag existTag = tagRepository.findByTagName(tagName).orElse(null);
 		// 중복 태그 생성 예외 처리
 		if (existTag != null) {
 			throw new CustomException(CustomExceptionType.DUPLICATE_TAG);
