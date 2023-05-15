@@ -12,24 +12,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Schema(description = "프롬프트 정보 DTO")
+@Schema(description = "프롬프트 정보 DTO + 프롬프트 pk")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Prompt {
+public class Prompt extends PromptDetails {
 
 	@Schema(description = "프롬프트 pk")
 	private Long promptId;
 
-	@Schema(description = "사용자의 요청")
-	private String requestDescription;
-
-	@Schema(description = "chatGPT의 응답")
-	private String responseDescription;
-
-	@Schema(description = "요청 시각")
-	private LocalDateTime transferDate;
+	@Builder
+	public Prompt(String requestDescription, String responseDescription, LocalDateTime transferDate,
+		Long promptId) {
+		super(requestDescription, responseDescription, transferDate);
+		this.promptId = promptId;
+	}
 }
