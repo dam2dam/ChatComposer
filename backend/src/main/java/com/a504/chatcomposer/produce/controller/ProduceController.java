@@ -103,10 +103,10 @@ public class ProduceController {
         resultMap.put("cover",produceService.createCover(coverRequest));
 
         // header 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_PNG);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.IMAGE_PNG);
 
-        return ResponseEntity.status(200).headers(headers).body(resultMap);
+        return ResponseEntity.status(200).body(resultMap);
     }
 
 
