@@ -1,22 +1,13 @@
 package com.a504.chatcomposer.user.dto.response;
 
-import com.a504.chatcomposer.music.dto.Member;
 import com.a504.chatcomposer.music.dto.enums.Genre;
-import com.a504.chatcomposer.music.entity.Music;
-import com.a504.chatcomposer.user.entity.FavoriteMusic;
+import com.a504.chatcomposer.user.entity.User;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.a504.chatcomposer.global.util.Utils.*;
 
 @Schema(description = "회원 정보 DTO")
 @Getter
@@ -32,7 +23,7 @@ public class UserResp {
 	private String userId;
 
 	@Schema(description = "사용자 번호")
-	private Long userSeq;
+	private Long memberId;
 
 	@Schema(description = "닉네임")
 	private String nickname;
@@ -43,8 +34,11 @@ public class UserResp {
 	@Schema(description = "장르 목록")
 	private List<Genre> favoriteGenres;
 
-	@QueryProjection
-	public UserResp(Long loginUserId, Music music, Long memberId, String nickname) {
-
+	public UserResp(User user, List<Genre> favoriteGenres) {
+		this.userId = user.getUserId();
+		this.memberId = user.getUserSeq();
+		this.nickname = user.getNickname();
+		this.email = user.getEmail();
+		this.favoriteGenres = favoriteGenres;
 	}
 }
