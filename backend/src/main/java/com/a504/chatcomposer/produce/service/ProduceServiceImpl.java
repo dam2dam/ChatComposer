@@ -1,6 +1,7 @@
 package com.a504.chatcomposer.produce.service;
 
 import com.a504.chatcomposer.global.util.S3Uploader;
+import com.a504.chatcomposer.produce.dto.request.MixedMusicReq;
 import com.a504.chatcomposer.produce.dto.request.MultipartFileReq;
 import com.a504.chatcomposer.produce.dto.request.OriginalMusicReq;
 import com.a504.chatcomposer.produce.dto.response.FileUrlResp;
@@ -29,13 +30,13 @@ public class ProduceServiceImpl implements ProduceService {
     private final RabbitTemplate rabbitTemplate;
 
     @Override
-    public byte[] createMusic(OriginalMusicReq originalMusicReq) throws IOException, InterruptedException {
+    public byte[] createMusic(String musicSource, String prompt) throws IOException, InterruptedException {
         // Generate correlation ID
         String correlationId = UUID.randomUUID().toString();
 
         // Convert CoverUrlResp object to byte array
         ObjectMapper objectMapper = new ObjectMapper();
-        byte[] body = objectMapper.writeValueAsBytes(originalMusicReq);
+        byte[] body = objectMapper.writeValueAsBytes(MixedMusicReq.of(musicSource, prompt));
 
         //unique Queue create
         String replyQueueName = "response.queue";
@@ -64,7 +65,7 @@ public class ProduceServiceImpl implements ProduceService {
         byte[] originalMusic = response.take();
         channel.basicCancel(ctag);
 
-        LOGGER.info("====ctag====\n" + ctag + "====response.take()====\n" + new String(originalMusic, "UTF-8"));
+        LOGGER.info("\n====ctag====\n" + ctag + "\n====response.take()====\n" + new String(originalMusic, "UTF-8"));
 
         return originalMusic;
     }
@@ -96,13 +97,19 @@ public class ProduceServiceImpl implements ProduceService {
 
         DeliverCallback callback = (consumerTag, delivery) -> {
             //되받은 메세지에 담긴 correlationId를 요청보낸 correlationId와 대조
-            if(delivery.getProperties().getCorrelationId().equals(correlationId))
+            if(delivery.getProperties().getCorrelationId().equals(correlationId)){
+                LOGGER.info("\n====callback====\n");
                 response.offer(delivery.getBody());
+            }
+
         };
 
         String ctag = channel.basicConsume(replyQueueName, true, callback, consumerTag -> {});
         byte[] result = response.take();
         channel.basicCancel(ctag);
+
+        LOGGER.info("\n====ctag====\n" + ctag + "\n====response.take()====\n" + new String(result, "UTF-8"));
+
 
         return result;
     }
