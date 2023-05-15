@@ -20,7 +20,14 @@ public enum CustomExceptionType {
 
 	// TAG
 	TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "태그 전체 조회에 실패했습니다. 태그가 존재하지 않습니다."),
-	DUPLICATE_TAG(HttpStatus.BAD_REQUEST, "이미 등록된 태그입니다.");
+	DUPLICATE_TAG(HttpStatus.BAD_REQUEST, "이미 등록된 태그입니다."),
+	UNREGISTERED_TAG(HttpStatus.NOT_FOUND, "태그 등록 후 사용해주세요"),
+
+	// GENRE
+	GENRE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 장르입니다."),
+
+	// BEAT
+	BEAT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 박자입니다.");
 
 	private final HttpStatus httpStatus;
 	private final int code;
