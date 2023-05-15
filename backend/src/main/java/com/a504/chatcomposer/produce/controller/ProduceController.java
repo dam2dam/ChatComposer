@@ -40,7 +40,7 @@ public class ProduceController {
             @ApiResponse(responseCode = "200", description = "원본 음악 저장 완료"),
             @ApiResponse(responseCode = "404", description = "원본 음악 저장 실패")
     })
-    @PostMapping(path = "/musics/original")
+    @PostMapping(path = "/musics/original", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<FileUrlResp> saveMidiFile(@ModelAttribute MultipartFileReq fileReq) {
 
         String source = produceService.saveMIDI(fileReq);
@@ -83,7 +83,7 @@ public class ProduceController {
             @ApiResponse(responseCode = "200", description = "믹싱 음악 저장 완료"),
             @ApiResponse(responseCode = "404", description = "믹싱 음악 저장 실패")
     })
-    @PostMapping(path = "/musics/mixed")
+    @PostMapping(path = "/musics/mixed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<FileUrlResp> saveMusic(@ModelAttribute MultipartFileReq fileReq) {
 
         String source = produceService.saveMusic(fileReq);
