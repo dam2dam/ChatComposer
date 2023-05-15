@@ -6,6 +6,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.a504.chatcomposer.global.exception.CustomException;
+import com.a504.chatcomposer.global.exception.CustomExceptionType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -48,7 +51,7 @@ public enum Genre {
 		if (OPERATOR_MAP.containsKey(number)) {
 			return OPERATOR_MAP.get(number);
 		} else {
-			return null;
+			throw new CustomException(CustomExceptionType.GENRE_NOT_FOUND);
 		}
 	}
 }
