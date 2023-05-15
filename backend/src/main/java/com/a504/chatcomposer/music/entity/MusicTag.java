@@ -40,4 +40,16 @@ public class MusicTag {
 	@ManyToOne
 	@JoinColumn(name = "tag_id")
 	private Tag tag;
+
+	/* 연관관계 메서드 설정 */
+	public void setMusic(Music music) {
+		this.music = music;
+		music.getMusicTags().add(this);
+	}
+
+	/* 연관관계 메서드 설정 */
+	public void setTag(Tag tag) {
+		this.tag = tag;
+		tag.getMusicTags().add(this);
+	}
 }

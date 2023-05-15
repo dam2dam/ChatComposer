@@ -1,5 +1,6 @@
 package com.a504.chatcomposer.music.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -42,7 +43,12 @@ public class Track {
 	@Column(name = "musical_instrument", length = 20)
 	private String musicalInstrument;
 
-	@OneToOne(mappedBy = "track")
+	@OneToOne(mappedBy = "track", cascade = CascadeType.PERSIST)
 	private Prompt prompt;
 
+	/* 연관관계 메서드 설정 */
+	public void setMusic(Music music) {
+		this.music = music;
+		music.getTracks().add(this);
+	}
 }
