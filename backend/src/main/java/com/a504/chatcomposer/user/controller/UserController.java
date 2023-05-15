@@ -3,6 +3,7 @@ package com.a504.chatcomposer.user.controller;
 import com.a504.chatcomposer.global.common.ApiResponse;
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.music.dto.enums.Genre;
+import com.a504.chatcomposer.user.dto.request.UserUpdateReq;
 import com.a504.chatcomposer.user.dto.response.UserResp;
 import com.a504.chatcomposer.user.entity.User;
 import com.a504.chatcomposer.user.service.UserService;
@@ -15,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -53,6 +52,25 @@ public class UserController {
         resultMap.put("msg","회원정보를 조회하였습니다.");
         resultMap.put("result",userResp);
 
+        return ResponseEntity.ok().body(resultMap);
+    }
+
+
+    //
+    @Operation(summary = "유저 정보 수정", description = "사용자의 닉네임, 선호 장르 목록을 수정합니다.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "사용자 조회 완료"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "사용자 조회 실패")
+    })
+    @PatchMapping
+    public ResponseEntity<?> updateUser(@RequestBody UserUpdateReq userUpdateReq) {
+        // principal에서 토큰 정보를 받아올 수 있음!
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = principal.getUsername();
+        userService.updateUser(userId, userUpdateReq);
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("msg","회원정보를 수정하였습니다.");
         return ResponseEntity.ok().body(resultMap);
     }
 
