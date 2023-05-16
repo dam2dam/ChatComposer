@@ -1,5 +1,6 @@
 package com.a504.chatcomposer.music.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -17,10 +18,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Member {
+public class User {
 
 	@Schema(description = "사용자 pk")
-	private long memberId;
+	@JsonProperty("memberId")
+	private long userSeq;
 
 	@Schema(description = "사용자 닉네임")
 	private String nickname;
