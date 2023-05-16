@@ -2,22 +2,25 @@ package com.a504.chatcomposer.music.controller;
 
 import java.util.List;
 
-import com.a504.chatcomposer.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.a504.chatcomposer.global.util.BaseResponseBody;
+import com.a504.chatcomposer.music.dto.request.CompleteMusicReq;
+import com.a504.chatcomposer.music.dto.response.CompleteMusicResp;
 import com.a504.chatcomposer.music.dto.response.MusicDetailResp;
 import com.a504.chatcomposer.music.dto.response.MusicsResp;
 import com.a504.chatcomposer.music.service.FavoriteMusicService;
 import com.a504.chatcomposer.music.service.MusicService;
+import com.a504.chatcomposer.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,11 +51,13 @@ public class MusicController {
 		@RequestParam(required = false, value = "title") String title,
 		@RequestParam(required = false, value = "is-my-favorite") String isMyFavorite) {
 
-		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
+			.getAuthentication()
+			.getPrincipal();
 		Long loginUserId = userService.getUserSeq(principal.getUsername());
 
-		List<MusicsResp> musicsResps = musicService.getMusicList(genre, tag, nickname, title, isMyFavorite,
-			loginUserId);
+		List<MusicsResp> musicsResps =
+			musicService.getMusicList(genre, tag, nickname, title, isMyFavorite, loginUserId);
 		return ResponseEntity.ok().body(musicsResps);
 	}
 
@@ -64,7 +69,9 @@ public class MusicController {
 	@GetMapping("/{music_id}")
 	public ResponseEntity<?> getMusicDetail(@PathVariable("music_id") Long musicId) {
 
-		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
+			.getAuthentication()
+			.getPrincipal();
 		Long loginUserId = userService.getUserSeq(principal.getUsername());
 
 		MusicDetailResp musicDetailResp = musicService.getMusicDetail(musicId, loginUserId);
@@ -79,7 +86,9 @@ public class MusicController {
 	@PostMapping("/{music_id}")
 	public ResponseEntity<?> createFavoriteMusic(@PathVariable("music_id") Long musicId) {
 
-		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
+			.getAuthentication()
+			.getPrincipal();
 		Long loginUserId = userService.getUserSeq(principal.getUsername());
 
 		favoriteMusicService.createFavoriteMusic(musicId, loginUserId);
@@ -94,10 +103,29 @@ public class MusicController {
 	@DeleteMapping("/{music_id}")
 	public ResponseEntity<?> deleteFavoriteMusic(@PathVariable("music_id") Long musicId) {
 
-		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
+			.getAuthentication()
+			.getPrincipal();
 		Long loginUserId = userService.getUserSeq(principal.getUsername());
 
 		favoriteMusicService.deleteFavoriteMusic(musicId, loginUserId);
 		return ResponseEntity.ok().body(new BaseResponseBody(200, "음악 좋아요를 취소했습니다."));
+	}
+
+	@Operation(summary = "완성된 음악 저장", description = "완성된 음악을 저장합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "음악 저장 완료"),
+		@ApiResponse(responseCode = "400", description = "음악 저장 실패")
+	})
+	@PostMapping
+	public ResponseEntity<?> saveMusic(@RequestBody CompleteMusicReq completeMusicReq) {
+
+		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
+			.getAuthentication()
+			.getPrincipal();
+		Long loginUserId = userService.getUserSeq(principal.getUsername());
+
+		String mixedMusicSource = musicService.saveMusic(completeMusicReq, loginUserId);
+		return ResponseEntity.ok().body(new CompleteMusicResp(mixedMusicSource));
 	}
 }

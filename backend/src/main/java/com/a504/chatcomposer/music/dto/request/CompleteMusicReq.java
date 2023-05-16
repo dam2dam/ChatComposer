@@ -2,12 +2,8 @@ package com.a504.chatcomposer.music.dto.request;
 
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import com.a504.chatcomposer.music.dto.Prompt;
-import com.a504.chatcomposer.music.dto.Track;
-import com.a504.chatcomposer.music.dto.enums.Beat;
-import com.a504.chatcomposer.music.dto.enums.Genre;
+import com.a504.chatcomposer.music.dto.PromptDetails;
+import com.a504.chatcomposer.music.dto.TrackDetails;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -17,18 +13,20 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Schema(description = "음악 저장 요청 정보 DTO")
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CompleteMusicReq {
 
 	@Schema(description = "음악 제목")
-	private MultipartFile title;
+	private String title;
 
 	@Schema(description = "태그 목록")
 	private List<String> tags;
@@ -37,16 +35,16 @@ public class CompleteMusicReq {
 	private String description;
 
 	@Schema(description = "장르")
-	private Genre genre;
+	private Integer genre;
 
 	@Schema(description = "박자")
-	private Beat beat;
+	private String beat;
 
 	@Schema(description = "트랙 목록")
-	private List<Track> tracks;
+	private List<TrackDetails> tracks;
 
 	@Schema(description = "프롬프트 목록")
-	private List<Prompt> prompts;
+	private List<PromptDetails> prompts;
 
 	@Schema(description = "MIDI wav 파일 S3 URL")
 	private String musicSource;
@@ -62,7 +60,4 @@ public class CompleteMusicReq {
 
 	@Schema(description = "앨범 커버 이미지의 S3 URL")
 	private String coverSource;
-
-	@Schema(description = "좋아요 수", defaultValue = "0")
-	private int favoriteCount;
 }

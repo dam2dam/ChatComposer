@@ -12,9 +12,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,7 +44,11 @@ public class Prompt {
 
 	@NotNull
 	@Column(name = "created_at")
-	@CreationTimestamp
-	@ColumnDefault("CURRENT_TIMESTAMP")
 	private LocalDateTime createdAt;
+
+	/* 연관관계 메서드 설정 */
+	public void setTrack(Track track) {
+		this.track = track;
+		track.setPrompt(this);
+	}
 }

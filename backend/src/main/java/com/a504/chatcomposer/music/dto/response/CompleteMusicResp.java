@@ -1,4 +1,4 @@
-package com.a504.chatcomposer.music.dto;
+package com.a504.chatcomposer.music.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -10,20 +10,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Schema(description = "트랙 정보 DTO + 트랙 pk")
+@Schema(description = "음악 완성 응답 DTO")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Track extends TrackDetails {
+public class CompleteMusicResp {
 
-	@Schema(description = "트랙 pk")
-	private Long trackId;
-
-	@Builder
-	public Track(String midiDescription, String musicalInstrument, Long trackId) {
-		super(midiDescription, musicalInstrument);
-		this.trackId = trackId;
-	}
+	@Schema(description = "리퓨전으로 합성된 wav의 url")
+	private String mixedMusicSource;
 }

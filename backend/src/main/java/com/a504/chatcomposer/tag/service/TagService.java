@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import com.a504.chatcomposer.global.exception.CustomException;
 import com.a504.chatcomposer.global.exception.CustomExceptionType;
@@ -26,7 +25,7 @@ public class TagService {
 	 */
 	public void createTag(String tagName) {
 
-		Tag existTag = tagRepository.findByTagNameLike(tagName).orElse(null);
+		Tag existTag = tagRepository.findByTagName(tagName).orElse(null);
 		// 중복 태그 생성 예외 처리
 		if (existTag != null) {
 			throw new CustomException(CustomExceptionType.DUPLICATE_TAG);
@@ -47,9 +46,9 @@ public class TagService {
 
 		List<Tag> tags = tagRepository.findAll();
 		// 태그 목록 조회 예외 처리
-		if (CollectionUtils.isEmpty(tags)) {
-			throw new CustomException(CustomExceptionType.TAG_NOT_FOUND);
-		}
+		// if (CollectionUtils.isEmpty(tags)) {
+		// 	throw new CustomException(CustomExceptionType.TAG_NOT_FOUND);
+		// }
 		log.info("TagService | getTags() tags: {}", tags);
 
 		return tags.stream().map(tag ->

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,13 +18,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.a504.chatcomposer.user.entity.User;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.a504.chatcomposer.user.entity.FavoriteMusic;
 import com.a504.chatcomposer.music.dto.enums.Beat;
 import com.a504.chatcomposer.music.dto.enums.Genre;
+import com.a504.chatcomposer.user.entity.FavoriteMusic;
+import com.a504.chatcomposer.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -91,12 +92,12 @@ public class Music {
 	@ColumnDefault("CURRENT_TIMESTAMP")
 	private LocalDateTime createdAt;
 
-	@OneToMany(mappedBy = "music")
+	@OneToMany(mappedBy = "music", cascade = CascadeType.PERSIST)
 	private List<Track> tracks = new ArrayList<>();
 
 	@OneToMany(mappedBy = "music")
 	private List<FavoriteMusic> favoriteMusics = new ArrayList<>();
 
-	@OneToMany(mappedBy = "music")
+	@OneToMany(mappedBy = "music", cascade = CascadeType.PERSIST)
 	private List<MusicTag> musicTags = new ArrayList<>();
 }
