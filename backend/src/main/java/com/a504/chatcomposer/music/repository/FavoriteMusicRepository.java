@@ -9,6 +9,6 @@ import com.a504.chatcomposer.user.entity.FavoriteMusic;
 
 @Repository
 public interface FavoriteMusicRepository extends JpaRepository<FavoriteMusic, Long> {
-	
-	Optional<FavoriteMusic> findByMusic_idAndUser_UserSeq(Long musicId, Long loginUserId);
+
+	Optional<FavoriteMusic> findByMusic_idAndUser_UserSeq(Long musicId, Long loginUserSeq);
 }

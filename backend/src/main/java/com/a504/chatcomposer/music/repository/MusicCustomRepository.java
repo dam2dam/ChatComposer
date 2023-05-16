@@ -17,10 +17,10 @@ public interface MusicCustomRepository {
 	 * 음악 리스트 조회
 	 */
 	List<MusicsResp> getMusicList(Integer genre, String tag, String nickname, String title, String isMyFavorite,
-		Long loginUserId);
+		Long loginUserSeq);
 
 	/**
 	 * 음악 상세 조회
 	 */
-	MusicDetailResp getMusicDetail(Long musicId, Long loginUserId);
+	MusicDetailResp getMusicDetail(Long musicId, Long loginUserSeq);
 }
