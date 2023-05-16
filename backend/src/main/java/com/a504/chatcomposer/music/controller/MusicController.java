@@ -3,7 +3,8 @@ package com.a504.chatcomposer.music.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,15 +50,11 @@ public class MusicController {
 		@RequestParam(required = false, value = "tag") String tag,
 		@RequestParam(required = false, value = "nickname") String nickname,
 		@RequestParam(required = false, value = "title") String title,
-		@RequestParam(required = false, value = "is-my-favorite") String isMyFavorite) {
-
-		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
-			.getAuthentication()
-			.getPrincipal();
-		Long loginUserId = userService.getUserSeq(principal.getUsername());
+		@RequestParam(required = false, value = "is-my-favorite") String isMyFavorite,
+		@AuthenticationPrincipal User principal) {
 
 		List<MusicsResp> musicsResps =
-			musicService.getMusicList(genre, tag, nickname, title, isMyFavorite, loginUserId);
+			musicService.getMusicList(genre, tag, nickname, title, isMyFavorite, principal);
 		return ResponseEntity.ok().body(musicsResps);
 	}
 
@@ -67,14 +64,10 @@ public class MusicController {
 		@ApiResponse(responseCode = "404", description = "음악 상세 조회 실패")
 	})
 	@GetMapping("/{music_id}")
-	public ResponseEntity<?> getMusicDetail(@PathVariable("music_id") Long musicId) {
+	public ResponseEntity<?> getMusicDetail(@PathVariable("music_id") Long musicId,
+		@AuthenticationPrincipal User principal) {
 
-		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
-			.getAuthentication()
-			.getPrincipal();
-		Long loginUserId = userService.getUserSeq(principal.getUsername());
-
-		MusicDetailResp musicDetailResp = musicService.getMusicDetail(musicId, loginUserId);
+		MusicDetailResp musicDetailResp = musicService.getMusicDetail(musicId, principal);
 		return ResponseEntity.ok().body(musicDetailResp);
 	}
 
@@ -84,14 +77,10 @@ public class MusicController {
 		@ApiResponse(responseCode = "404", description = "음악 좋아요 실패")
 	})
 	@PostMapping("/{music_id}")
-	public ResponseEntity<?> createFavoriteMusic(@PathVariable("music_id") Long musicId) {
+	public ResponseEntity<?> createFavoriteMusic(@PathVariable("music_id") Long musicId,
+		@AuthenticationPrincipal User principal) {
 
-		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
-			.getAuthentication()
-			.getPrincipal();
-		Long loginUserId = userService.getUserSeq(principal.getUsername());
-
-		favoriteMusicService.createFavoriteMusic(musicId, loginUserId);
+		favoriteMusicService.createFavoriteMusic(musicId, principal);
 		return ResponseEntity.ok().body(new BaseResponseBody(200, "음악 좋아요를 추가했습니다."));
 	}
 
@@ -101,14 +90,10 @@ public class MusicController {
 		@ApiResponse(responseCode = "404", description = "음악 좋아요 삭제 실패")
 	})
 	@DeleteMapping("/{music_id}")
-	public ResponseEntity<?> deleteFavoriteMusic(@PathVariable("music_id") Long musicId) {
+	public ResponseEntity<?> deleteFavoriteMusic(@PathVariable("music_id") Long musicId,
+		@AuthenticationPrincipal User principal) {
 
-		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
-			.getAuthentication()
-			.getPrincipal();
-		Long loginUserId = userService.getUserSeq(principal.getUsername());
-
-		favoriteMusicService.deleteFavoriteMusic(musicId, loginUserId);
+		favoriteMusicService.deleteFavoriteMusic(musicId, principal);
 		return ResponseEntity.ok().body(new BaseResponseBody(200, "음악 좋아요를 취소했습니다."));
 	}
 
@@ -118,14 +103,10 @@ public class MusicController {
 		@ApiResponse(responseCode = "400", description = "음악 저장 실패")
 	})
 	@PostMapping
-	public ResponseEntity<?> saveMusic(@RequestBody CompleteMusicReq completeMusicReq) {
+	public ResponseEntity<?> saveMusic(@RequestBody CompleteMusicReq completeMusicReq,
+		@AuthenticationPrincipal User principal) {
 
-		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext()
-			.getAuthentication()
-			.getPrincipal();
-		Long loginUserId = userService.getUserSeq(principal.getUsername());
-
-		String mixedMusicSource = musicService.saveMusic(completeMusicReq, loginUserId);
+		String mixedMusicSource = musicService.saveMusic(completeMusicReq, principal);
 		return ResponseEntity.ok().body(new CompleteMusicResp(mixedMusicSource));
 	}
 }

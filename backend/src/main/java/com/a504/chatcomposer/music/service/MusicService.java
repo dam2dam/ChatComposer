@@ -27,9 +27,14 @@ import com.a504.chatcomposer.user.entity.User;
 import com.a504.chatcomposer.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Music 관련 비즈니스 로직을 구현한 클래스
+ */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MusicService {
 
 	private final MusicRepository musicRepository;
@@ -40,27 +45,44 @@ public class MusicService {
 	 * 음악 리스트 조회
 	 */
 	public List<MusicsResp> getMusicList(Integer genre, String tag, String nickname, String title, String isMyFavorite,
-		Long loginUserId) {
+		org.springframework.security.core.userdetails.User principal) {
 
-		return musicRepository.getMusicList(genre, tag, nickname, title, isMyFavorite, loginUserId);
+		Long loginUserSeq = null;
+		if (principal != null) {
+			loginUserSeq = userRepository.findUserSeqByUserId(principal.getUsername());
+		}
+
+		log.info("getMusicList() loginUserSeq: {}", loginUserSeq);
+
+		return musicRepository.getMusicList(genre, tag, nickname, title, isMyFavorite, loginUserSeq);
 	}
 
 	/**
 	 * 음악 상세 조회
 	 */
-	public MusicDetailResp getMusicDetail(Long musicId, Long loginUserId) {
+	public MusicDetailResp getMusicDetail(Long musicId, org.springframework.security.core.userdetails.User principal) {
 
-		return musicRepository.getMusicDetail(musicId, loginUserId);
+		Long loginUserSeq = null;
+		if (principal != null) {
+			loginUserSeq = userRepository.findUserSeqByUserId(principal.getUsername());
+		}
+
+		log.info("getMusicList() loginUserSeq: {}", loginUserSeq);
+
+		return musicRepository.getMusicDetail(musicId, loginUserSeq);
 	}
 
 	/**
 	 * 완성된 음악 저장
 	 */
 	@Transactional
-	public String saveMusic(CompleteMusicReq completeMusicReq, Long loginUserId) {
+	public String saveMusic(CompleteMusicReq completeMusicReq,
+		org.springframework.security.core.userdetails.User principal) {
 
 		// User user = userRepository.findByUserId(loginUserId); // eager loading
-		User user = userRepository.getReferenceById(loginUserId); // lazy loading
+		User user = userRepository.getReferenceByUserId(principal.getUsername()); // lazy loading
+
+		log.info("saveMusic() user: {}", user);
 
 		Music music = Music.builder()
 			.user(user)

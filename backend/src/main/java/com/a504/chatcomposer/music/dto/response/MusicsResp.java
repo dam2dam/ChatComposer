@@ -9,10 +9,11 @@ import java.util.stream.Collectors;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
-import com.a504.chatcomposer.user.entity.FavoriteMusic;
-import com.a504.chatcomposer.music.dto.Member;
+import com.a504.chatcomposer.music.dto.User;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 import com.a504.chatcomposer.music.entity.Music;
+import com.a504.chatcomposer.user.entity.FavoriteMusic;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.querydsl.core.annotations.QueryProjection;
@@ -39,7 +40,8 @@ public class MusicsResp {
 	private long musicId;
 
 	@Schema(description = "작성자 정보")
-	private Member member;
+	@JsonProperty("member")
+	private User user;
 
 	@Schema(description = "음악 제목")
 	private String title;
@@ -64,7 +66,7 @@ public class MusicsResp {
 	private String isMyFavorite;
 
 	@QueryProjection
-	public MusicsResp(Long loginUserId, Music music, Long memberId, String nickname) {
+	public MusicsResp(Long loginUserSeq, Music music, Long userSeq, String nickname) {
 
 		this.musicId = music.getId();
 		this.title = music.getTitle();
@@ -74,8 +76,8 @@ public class MusicsResp {
 		this.coverSource = music.getCoverSource();
 
 		// 작성자 정보
-		this.member = Member.builder()
-			.memberId(memberId)
+		this.user = User.builder()
+			.userSeq(userSeq)
 			.nickname(nickname)
 			.build();
 
@@ -87,9 +89,9 @@ public class MusicsResp {
 		String isMyFavorite = NO;
 		List<FavoriteMusic> favoriteMusics = music.getFavoriteMusics();
 		// 누군가 좋아요 한 음악이고 로그인 된 요청이라면 음악 좋아요 여부 판단
-		if (!CollectionUtils.isEmpty(favoriteMusics) && loginUserId != NOT_LOGIN) {
+		if (!CollectionUtils.isEmpty(favoriteMusics) && loginUserSeq != NOT_LOGIN) {
 			for (int i = 0; i < favoriteMusics.size(); i++) {
-				if (favoriteMusics.get(i).getUser().getUserSeq().equals(loginUserId)) {
+				if (favoriteMusics.get(i).getUser().getUserSeq().equals(loginUserSeq)) {
 					isMyFavorite = YES;
 					break;
 				}

@@ -7,16 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.a504.chatcomposer.user.entity.User;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
-import com.a504.chatcomposer.user.entity.FavoriteMusic;
 import com.a504.chatcomposer.music.dto.Prompt;
 import com.a504.chatcomposer.music.dto.Track;
+import com.a504.chatcomposer.music.dto.User;
 import com.a504.chatcomposer.music.dto.enums.Beat;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 import com.a504.chatcomposer.music.entity.Music;
+import com.a504.chatcomposer.user.entity.FavoriteMusic;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.querydsl.core.annotations.QueryProjection;
@@ -43,6 +44,7 @@ public class MusicDetailResp {
 	private long musicId;
 
 	@Schema(description = "작성자 정보")
+	@JsonProperty("member")
 	private User user;
 
 	@Schema(description = "음악 제목")
@@ -92,7 +94,7 @@ public class MusicDetailResp {
 	private String isMyFavorite;
 
 	@QueryProjection
-	public MusicDetailResp(Long loginUserId, Music music, Long memberId, String nickname) {
+	public MusicDetailResp(Long loginUserSeq, Music music, Long userSeq, String nickname) {
 
 		this.musicId = music.getId();
 		this.title = music.getTitle();
@@ -109,9 +111,9 @@ public class MusicDetailResp {
 
 		// 작성자 정보
 		this.user = User.builder()
-				.userSeq(memberId)
-				.nickname(nickname)
-				.build();
+			.userSeq(userSeq)
+			.nickname(nickname)
+			.build();
 
 		// music tags -> tag name 리스트로 만들기
 		this.tags = music.getMusicTags().stream()
@@ -146,10 +148,9 @@ public class MusicDetailResp {
 		String isMyFavorite = NO;
 		List<FavoriteMusic> favoriteMusics = music.getFavoriteMusics();
 		// 누군가 좋아요 한 음악이고 로그인 된 요청이라면 음악 좋아요 여부 판단
-		if (!CollectionUtils.isEmpty(favoriteMusics) && loginUserId != NOT_LOGIN) {
+		if (!CollectionUtils.isEmpty(favoriteMusics) && loginUserSeq != NOT_LOGIN) {
 			for (int i = 0; i < favoriteMusics.size(); i++) {
-//				if (favoriteMusics.get(i).getMember().getId().equals(loginUserId)) {
-				if (favoriteMusics.get(i).getUser().getUserSeq().equals(loginUserId)) {
+				if (favoriteMusics.get(i).getUser().getUserSeq().equals(loginUserSeq)) {
 					isMyFavorite = YES;
 					break;
 				}
@@ -157,6 +158,5 @@ public class MusicDetailResp {
 		}
 		// 아무도 좋아요를 누르지 않은 음악이거나 로그인 하지 않은 상태의 요청은 무조건 NO
 		this.isMyFavorite = isMyFavorite;
-
 	}
 }

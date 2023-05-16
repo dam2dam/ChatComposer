@@ -4,12 +4,10 @@ import static com.a504.chatcomposer.global.util.Utils.*;
 
 import java.util.List;
 
-import com.a504.chatcomposer.user.entity.QUser;
 import org.springframework.util.StringUtils;
 
 import com.a504.chatcomposer.global.exception.CustomException;
 import com.a504.chatcomposer.global.exception.CustomExceptionType;
-import com.a504.chatcomposer.user.entity.QFavoriteMusic;
 import com.a504.chatcomposer.music.dto.enums.Genre;
 import com.a504.chatcomposer.music.dto.response.MusicDetailResp;
 import com.a504.chatcomposer.music.dto.response.MusicsResp;
@@ -21,6 +19,8 @@ import com.a504.chatcomposer.music.entity.QMusicTag;
 import com.a504.chatcomposer.music.entity.QPrompt;
 import com.a504.chatcomposer.music.entity.QTrack;
 import com.a504.chatcomposer.tag.entity.QTag;
+import com.a504.chatcomposer.user.entity.QFavoriteMusic;
+import com.a504.chatcomposer.user.entity.QUser;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -47,13 +47,13 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 	@Override
 	public List<MusicsResp> getMusicList(Integer genre, String tagName, String nickname, String title,
 		String isMyFavorite,
-		Long loginUserId) {
+		Long loginUserSeq) {
 
-		log.info("MusicRepositoryImpl | getMusicList() loginUserId : {} ", loginUserId);
+		log.info("MusicRepositoryImpl | getMusicList() loginUserId : {} ", loginUserSeq);
 
 		List<MusicsResp> musicsResps = jpaQueryFactory
 			.select(new QMusicsResp(
-				Expressions.asNumber(isMember(loginUserId)).as("loginUserId"),
+				Expressions.asNumber(isMember(loginUserSeq)).as("loginUserSeq"),
 				music,
 				music.user.userSeq,
 				music.user.nickname)).distinct()
@@ -66,8 +66,7 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 				tagNameContains(tagName),
 				nicknameContains(nickname),
 				titleContains(title),
-				// TODO: '나'의 선호음악이므로 로그인 회원 정보를 사용해야 함
-				isLikedEq(isMyFavorite, loginUserId)
+				isLikedEq(isMyFavorite, loginUserSeq)
 			).fetch();
 
 		log.info("MusicRepositoryImpl | getMusicList() musicsResps : {}", musicsResps);
@@ -77,9 +76,9 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 	}
 
 	@Override
-	public MusicDetailResp getMusicDetail(Long musicId, Long loginUserId) {
+	public MusicDetailResp getMusicDetail(Long musicId, Long loginUserSeq) {
 
-		log.info("MusicRepositoryImpl | getMusicDetail() loginUserId : {} ", loginUserId);
+		log.info("MusicRepositoryImpl | getMusicDetail() loginUserSeq : {} ", loginUserSeq);
 
 		Music existMusic = jpaQueryFactory
 			.selectFrom(music)
@@ -93,14 +92,13 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 
 		MusicDetailResp musicDetailResp = jpaQueryFactory
 			.select(new QMusicDetailResp(
-				Expressions.asNumber(isMember(loginUserId)).as("loginUserId"),
+				Expressions.asNumber(isMember(loginUserSeq)).as("loginUserSeq"),
 				music,
 				user.userSeq,
 				user.nickname
 			))
 			.from(music)
 			.leftJoin(music.user, user)
-//			.leftJoin(member.memberProfile, memberProfile)
 			.leftJoin(music.tracks, track)
 			.leftJoin(track.prompt, prompt)
 			.leftJoin(music.musicTags, musicTag)
@@ -153,8 +151,11 @@ public class MusicRepositoryImpl implements MusicCustomRepository {
 	/**
 	 * @return favorite_music.member_id=?, or null
 	 */
-	private BooleanExpression isLikedEq(String isMyFavorite, Long loginUserId) {
-		return StringUtils.hasText(isMyFavorite) && isMyFavorite.equals(YES) ? favoriteMusic.user.userSeq.eq(loginUserId) :
+	private BooleanExpression isLikedEq(String isMyFavorite, Long loginUserSeq) {
+		return StringUtils.hasText(isMyFavorite)
+			&& isMyFavorite.equals(YES)
+			&& loginUserSeq != null ?
+			favoriteMusic.user.userSeq.eq(loginUserSeq) :
 			null;
 	}
 }
