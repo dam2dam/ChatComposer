@@ -28,7 +28,7 @@ public class PromptDetails {
 	@Schema(description = "chatGPT의 응답")
 	private String responseDescription;
 
-	@Schema(description = "요청 시각")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+	@Schema(description = "요청 시각", example = "2023-05-16T13:00:00")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
 	private LocalDateTime transferDate;
 }

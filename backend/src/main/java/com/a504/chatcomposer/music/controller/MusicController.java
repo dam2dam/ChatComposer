@@ -24,6 +24,7 @@ import com.a504.chatcomposer.music.service.MusicService;
 import com.a504.chatcomposer.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,7 +52,7 @@ public class MusicController {
 		@RequestParam(required = false, value = "nickname") String nickname,
 		@RequestParam(required = false, value = "title") String title,
 		@RequestParam(required = false, value = "is-my-favorite") String isMyFavorite,
-		@AuthenticationPrincipal User principal) {
+		@AuthenticationPrincipal @Parameter(hidden = true) User principal) {
 
 		List<MusicsResp> musicsResps =
 			musicService.getMusicList(genre, tag, nickname, title, isMyFavorite, principal);
@@ -65,7 +66,7 @@ public class MusicController {
 	})
 	@GetMapping("/{music_id}")
 	public ResponseEntity<?> getMusicDetail(@PathVariable("music_id") Long musicId,
-		@AuthenticationPrincipal User principal) {
+		@AuthenticationPrincipal @Parameter(hidden = true) User principal) {
 
 		MusicDetailResp musicDetailResp = musicService.getMusicDetail(musicId, principal);
 		return ResponseEntity.ok().body(musicDetailResp);
@@ -78,7 +79,7 @@ public class MusicController {
 	})
 	@PostMapping("/{music_id}")
 	public ResponseEntity<?> createFavoriteMusic(@PathVariable("music_id") Long musicId,
-		@AuthenticationPrincipal User principal) {
+		@AuthenticationPrincipal @Parameter(hidden = true) User principal) {
 
 		favoriteMusicService.createFavoriteMusic(musicId, principal);
 		return ResponseEntity.ok().body(new BaseResponseBody(200, "음악 좋아요를 추가했습니다."));
@@ -91,7 +92,7 @@ public class MusicController {
 	})
 	@DeleteMapping("/{music_id}")
 	public ResponseEntity<?> deleteFavoriteMusic(@PathVariable("music_id") Long musicId,
-		@AuthenticationPrincipal User principal) {
+		@AuthenticationPrincipal @Parameter(hidden = true) User principal) {
 
 		favoriteMusicService.deleteFavoriteMusic(musicId, principal);
 		return ResponseEntity.ok().body(new BaseResponseBody(200, "음악 좋아요를 취소했습니다."));
@@ -104,7 +105,7 @@ public class MusicController {
 	})
 	@PostMapping
 	public ResponseEntity<?> saveMusic(@RequestBody CompleteMusicReq completeMusicReq,
-		@AuthenticationPrincipal User principal) {
+		@AuthenticationPrincipal @Parameter(hidden = true) User principal) {
 
 		String mixedMusicSource = musicService.saveMusic(completeMusicReq, principal);
 		return ResponseEntity.ok().body(new CompleteMusicResp(mixedMusicSource));
