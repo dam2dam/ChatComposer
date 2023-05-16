@@ -47,7 +47,11 @@ public enum Beat {
 	}
 
 	public static Beat findByBpmValue(String bpmStringValue) {
-		return findByBpmValue(Integer.parseInt(bpmStringValue));
+		try {
+			return findByBpmValue(Integer.parseInt(bpmStringValue));
+		} catch (Exception exception) {
+			throw new CustomException(CustomExceptionType.BEAT_NOT_NUMBER);
+		}
 	}
 
 }

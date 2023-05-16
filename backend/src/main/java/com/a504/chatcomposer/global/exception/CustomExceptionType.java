@@ -28,7 +28,8 @@ public enum CustomExceptionType {
 	GENRE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 장르입니다."),
 
 	// BEAT
-	BEAT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 박자입니다.");
+	BEAT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 박자입니다. 박자는 60 ~ 180 사이의 값으로 입력해주세요."),
+	BEAT_NOT_NUMBER(HttpStatus.BAD_REQUEST, "박자는 60 ~ 180 사이의 값으로 입력해주세요.");
 
 	private final HttpStatus httpStatus;
 	private final int code;
