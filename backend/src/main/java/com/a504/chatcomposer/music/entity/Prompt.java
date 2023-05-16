@@ -36,10 +36,10 @@ public class Prompt {
 	@JoinColumn(name = "track_id")
 	private Track track;
 
-	@Column(name = "request_description", length = 500)
+	@Column(name = "request_description", columnDefinition = "TEXT")
 	private String requestDescription;
 
-	@Column(name = "midi_description", length = 500)
+	@Column(name = "midi_description", columnDefinition = "TEXT")
 	private String midiDescription;
 
 	@NotNull

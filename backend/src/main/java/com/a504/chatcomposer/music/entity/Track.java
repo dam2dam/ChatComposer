@@ -37,10 +37,10 @@ public class Track {
 	@JoinColumn(name = "music_id")
 	private Music music;
 
-	@Column(name = "midi_description", length = 500)
+	@Column(name = "midi_description", columnDefinition = "TEXT")
 	private String midiDescription;
 
-	@Column(name = "musical_instrument", length = 20)
+	@Column(name = "musical_instrument", length = 100)
 	private String musicalInstrument;
 
 	@OneToOne(mappedBy = "track", cascade = CascadeType.PERSIST)
