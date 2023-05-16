@@ -1,14 +1,18 @@
 package com.a504.chatcomposer.user.repository;
 
-import com.a504.chatcomposer.user.entity.User;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.a504.chatcomposer.user.entity.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    User findByUserId(String userId);
+public interface UserRepository extends JpaRepository<User, Long>, UserCustomRepository {
 
-    Optional<User> findByUserSeq(Long userSeq);
+	User findByUserId(String userId);
+
+	Optional<User> findByUserSeq(Long userSeq);
+
+	User getReferenceByUserId(String username);
 }
