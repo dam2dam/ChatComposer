@@ -1,5 +1,8 @@
 package com.a504.chatcomposer.music.service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -136,7 +139,7 @@ public class MusicService {
 			prompt = Prompt.builder()
 				.requestDescription(promptDetails.getRequestDescription())
 				.midiDescription(promptDetails.getResponseDescription())
-				.createdAt(promptDetails.getTransferDate())
+				.createdAt(stringtoLocalDateTime(promptDetails.getTransferDate()))
 				.build();
 
 			// 연관관계 저장
@@ -146,5 +149,18 @@ public class MusicService {
 		musicRepository.save(music);
 
 		return music.getMixedMusicSource();
+	}
+
+	/**
+	 * 숫자 문자열을 LocalDateTime 타입으로 변환
+	 */
+	private LocalDateTime stringtoLocalDateTime(String input) {
+		try {
+			Long longInput = Long.parseLong(input);
+			return LocalDateTime.ofInstant(Instant.ofEpochMilli(longInput), ZoneId.systemDefault());
+
+		} catch (Exception exception) {
+			throw new CustomException(CustomExceptionType.TRANSFER_DATE_NOT_NUMBER);
+		}
 	}
 }
