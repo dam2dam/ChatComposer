@@ -1,7 +1,5 @@
 package com.a504.chatcomposer.music.dto;
 
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -24,8 +22,7 @@ public class Prompt extends PromptDetails {
 	private Long promptId;
 
 	@Builder
-	public Prompt(String requestDescription, String responseDescription, LocalDateTime transferDate,
-		Long promptId) {
+	public Prompt(String requestDescription, String responseDescription, String transferDate, Long promptId) {
 		super(requestDescription, responseDescription, transferDate);
 		this.promptId = promptId;
 	}

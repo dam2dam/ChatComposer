@@ -18,6 +18,7 @@ public enum CustomExceptionType {
 	DUPLICATE_FAVORITE_MUSIC(HttpStatus.BAD_REQUEST, "이미 좋아요 한 음악입니다."),
 	FAIL_TO_DELETE_FAVORITE_MUSIC(HttpStatus.NOT_FOUND, "음악 좋아요 취소에 실패했습니다."),
 	FAIL_TO_SAVE_COMPLETE_MUSIC(HttpStatus.BAD_REQUEST, "음악 게시에 실패했습니다."),
+	TRANSFER_DATE_NOT_NUMBER(HttpStatus.BAD_REQUEST, "프롬프트 생성일은 숫자(문자열) 값으로 입력해주세요."),
 
 	// TAG
 	TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "태그 전체 조회에 실패했습니다. 태그가 존재하지 않습니다."),

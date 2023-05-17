@@ -138,7 +138,7 @@ public class MusicDetailResp {
 				.promptId(prompt.getId())
 				.requestDescription(prompt.getRequestDescription())
 				.responseDescription(prompt.getMidiDescription())
-				.transferDate(prompt.getCreatedAt())
+				.transferDate(String.valueOf(prompt.getCreatedAt()))
 				.build());
 		}
 		this.tracks = tracks;
