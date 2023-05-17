@@ -94,6 +94,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers(HttpMethod.GET,"/musics/**").permitAll()
                     .antMatchers(HttpMethod.GET,"/musics/**").permitAll()
                     .antMatchers("/users/access").permitAll()
+                    .antMatchers("/produce/**").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .oauth2Login()
