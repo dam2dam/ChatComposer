@@ -64,9 +64,7 @@ public class ProduceServiceImpl implements ProduceService {
         String ctag = channel.basicConsume(replyQueueName, true, callback, consumerTag -> {});
         byte[] originalMusic = response.take();
         channel.basicCancel(ctag);
-
-        LOGGER.info("\n====ctag====\n" + ctag + "\n====response.take()====\n" + new String(originalMusic, "UTF-8"));
-
+        
         return originalMusic;
     }
 
@@ -107,9 +105,6 @@ public class ProduceServiceImpl implements ProduceService {
         String ctag = channel.basicConsume(replyQueueName, true, callback, consumerTag -> {});
         byte[] result = response.take();
         channel.basicCancel(ctag);
-
-        LOGGER.info("\n====ctag====\n" + ctag + "\n====response.take()====\n" + new String(result, "UTF-8"));
-
 
         return result;
     }
