@@ -1,0 +1,6 @@
+fastapi[all]
+diffusers==0.16.0
+transformers
+scipy
+ftfy
+accelerate
