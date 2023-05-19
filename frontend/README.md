@@ -21,6 +21,19 @@
 }
 ```
 
+package.json 하단에 아래와 같이 추가
+
+```
+  },
+  "eslintConfig": {
+    "extends": [
+      "next/core-web-vitals",
+      "prettier"
+    ]
+  }
+}
+```
+
 ## tailwind
 
 https://tailwindcss.com/docs/guides/nextjs
@@ -98,8 +111,6 @@ pages\app.css에 아래와 같이 추가한다.
   }
 ```
 
------ 여기까지 완료
-
 ## recoil, recoil-persist
 
 아래의 깃헙 페이지에서 리코일의 기본적인 사용법이 나와있다.
@@ -137,6 +148,59 @@ const counterState = atom({
 + effects_UNSTABLE: [persistAtom],
 })
 ```
+
+이때 next.js에서는 클라이언트의 상태와 SSR의 상태가 달라 에러가 발생한다.
+이를 방지하지 위해서는 useEffect를 이용하여 SSR이 끝난 후에 recoil-persist의 상태를 불러오도록 설정하면 된다.
+
+아래는 recoil에 'SsrCompleted'의 default 상태를 false로 설정한 후,
+useEffect를 이용해 SsrCompleted 상태를 true로 바꾸는 패턴이다.
+SsrCompleted가 true로 바뀌었을 때에 recoil-persist의 상태가 적용된다.
+
+```ts
+import { AtomEffect, atom, useSetRecoilState } from "recoil";
+import { recoilPersist } from "recoil-persist";
+
+// next.js에서 사용하기 위해 ssr이 끝났는지를 확인하는 state이다.
+// 새로고침 시에 항상 default값인 false를 갖는다.
+const ssrCompletedState = atom({
+  key: "SsrCompleted",
+  default: false,
+});
+
+//useEffect에 쓰일 함수를 정의한다.
+export const useSsrComplectedState = () => {
+  const setSsrCompleted = useSetRecoilState(ssrCompletedState);
+  return () => setSsrCompleted(true);
+};
+
+const { persistAtom } = recoilPersist();
+
+//ssrCompletedState가 완료될 때까지 기다린 후, persistAtom을 반환한다.
+export const persistAtomEffect = <T>(param: Parameters<AtomEffect<T>>[0]) => {
+  param.getPromise(ssrCompletedState).then(() => persistAtom(param));
+};
+```
+
+상태에는 persistAtom대신 persistAtomEffect를 effect로 넣어주면 된다.
+
+```ts
+const counterState = atom({
+  key: 'count',
+  default: 0,
+- effects_UNSTABLE: [persistAtom],
++ effects_UNSTABLE: [persistAtomEffect],
+})
+```
+
+해당 persistAtomEffect를 사용하는 컴포넌트에서는 useEffect로 아래의 구문을 추가해주어야 한다.
+이를 통해 ssr이 완료되었을 때에 setSsrCompleted가 true로 바뀐다.
+
+```ts
+const setSsrCompleted = useSsrComplectedState();
+useEffect(setSsrCompleted, [setSsrCompleted]);
+```
+
+----- 여기까지 완료
 
 ## tanstack query
 
