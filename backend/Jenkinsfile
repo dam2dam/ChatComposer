@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('application.yml load'){
+          steps {
+            dir("backend") {
+            withCredentials([file(credentialsId: 'back-credential', variable: 'configFile')]){
+              script {
+                sh 'cp $configFile ./src/main/resources/application.yml'
+              }
+            }
+            }
+          }
+        }
+
+        stage('Gradle Build') {
+            steps {
+                dir("backend") {
+                    sh 'chmod +x gradlew'
+                    sh './gradlew clean build -x test'
+                }
+            }
+        }
+        
+        stage('Backend Docker Build') {
+            steps {
+                dir("backend") {
+                    sh 'docker build -t chco-backend:latest .'
+                }
+            }
+        }
+
+        stage('Backend Deploy') {
+            steps {
+                sh 'docker rm -f backend'
+                sh 'docker run -d --name backend -p 8080:8080 -u root chco-backend:latest'
+            }
+        }
+
+        stage('Finish') {
+            steps {
+                sh 'docker images -qf dangling=true | xargs -I{} docker rmi {}'
+            }
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "params": {
+    "checkpoint": "../training/riffusion-model",
+    "scheduler": "DPMSolverMultistepScheduler",
+    "num_inference_steps": 50,
+    "guidance": 7.0,
+    "width": 512,
+  },
+  "entries": [
+    {
+      "prompt": "Church bells",
+      "seed": 42
+    },
+    {
+      "prompt": "electronic beats",
+      "negative_prompt": "drums",
+      "seed": 100
+    },
+    {
+      "prompt": "classical violin concerto",
+      "seed": 4
+    }
+  ]
+}

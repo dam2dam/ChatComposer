@@ -9,7 +9,18 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        air: "#7c9eb2",
+        violetlight: "#52528C",
+        violetdark: "#372554",
+        emerald: "#b1fcc6",
+      },
+      fontFamily: {
+        monofett: ["Monofett", "cursive"],
+        sharetech: ["Share Tech Mono", "monospace"],
+      },
+    },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
 };

@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'node18'
+    }
+
+    stages {
+        stage('.env load'){
+            steps {
+                dir("frontend") {
+                    withCredentials([file(credentialsId: 'front-credential', variable: 'configFile')]){
+                        script {
+                            sh 'cp $configFile ./.env'
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Frontend Docker Build') {
+            steps {
+                dir("frontend") {
+                    sh 'docker build -t chco-frontend:latest .'
+                }
+            }
+        }
+
+        stage('Frontend Deploy') {
+            steps {
+                sh 'docker rm -f frontend'
+                sh 'docker run -d --name frontend -p 3000:3000 -u root chco-frontend:latest'
+            }
+        }
+
+        stage('Finish') {
+            steps {
+                sh 'docker images -qf dangling=true | xargs -I{} docker rmi {}'
+            }
+        }
+    }
+}
