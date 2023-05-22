@@ -74,13 +74,14 @@ public class AuthController {
 
         // userId refresh token 으로 Redis 확인
         String userRefreshToken = redisUtil.getData(userId);
-        if (userRefreshToken == null) {
-            //없는 경우 새로 등록
-            redisUtil.setDataExpire(userId, refreshToken.getToken(), refreshTokenExpiry);
-        } else {
+        if (userRefreshToken != null) {
             //refresh 토큰 업데이트
             redisUtil.setData(userId, refreshToken.getToken());
+            AuthToken authToken1 = tokenProvider.convertAuthToken(userRefreshToken);
+            Date expireDate = tokenProvider.convertAuthToken(userRefreshToken).getTokenClaims().getExpiration();
+            refreshTokenExpiry = expireDate.getTime() - new Date().getTime();
         }
+        redisUtil.setDataExpire(userId, refreshToken.getToken(), refreshTokenExpiry);
 
         int cookieMaxAge = (int) refreshTokenExpiry / 60;
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);

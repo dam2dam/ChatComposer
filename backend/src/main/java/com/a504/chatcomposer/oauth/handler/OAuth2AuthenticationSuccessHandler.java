@@ -96,13 +96,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String token = vop.get(userInfo.getId());
         if (token != null) { //레디스에 저장되어있다면
             //리프레쉬 토큰 갱신
-            logger.info("[Redis] 토큰이 이미 저장되어있습니다.");
-            redisUtil.setData(userInfo.getId(),refreshToken.getToken());
-        } else { //저장되어있지 않다면
-            //새로 레디스에 저장
-            logger.info("[Redis] 토큰을 새로 저장합니다. "+refreshTokenExpiry);
-            redisUtil.setDataExpire(userInfo.getId(),refreshToken.getToken(),refreshTokenExpiry);
+            logger.info("[Redis] 토큰이 이미 저장되어있습니다."+token);
+            Date expireDate = tokenProvider.convertAuthToken(token).getTokenClaims().getExpiration();
+            refreshTokenExpiry = expireDate.getTime() - new Date().getTime();
         }
+        redisUtil.setDataExpire(userInfo.getId(),refreshToken.getToken(),refreshTokenExpiry);
 
         int cookieMaxAge = (int) refreshTokenExpiry / 60;
 
