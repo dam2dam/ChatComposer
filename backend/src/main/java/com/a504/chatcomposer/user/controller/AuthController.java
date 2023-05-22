@@ -4,9 +4,8 @@ import com.a504.chatcomposer.global.common.ApiResponse;
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.global.util.CookieUtil;
 import com.a504.chatcomposer.global.util.HeaderUtil;
+import com.a504.chatcomposer.global.util.RedisUtil;
 import com.a504.chatcomposer.user.entity.AuthReqModel;
-import com.a504.chatcomposer.user.entity.UserRefreshToken;
-import com.a504.chatcomposer.user.repository.UserRefreshTokenRepository;
 import com.a504.chatcomposer.oauth.entity.RoleType;
 import com.a504.chatcomposer.oauth.entity.UserPrincipal;
 import com.a504.chatcomposer.oauth.token.AuthToken;
@@ -14,6 +13,9 @@ import com.a504.chatcomposer.oauth.token.AuthTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,6 +31,7 @@ import java.util.Date;
 @RestController
 @RequestMapping("/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final static long THREE_DAYS_MSEC = 259200000;
@@ -36,7 +39,8 @@ public class AuthController {
     private final AppProperties appProperties;
     private final AuthTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
-    private final UserRefreshTokenRepository userRefreshTokenRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
 
     @PostMapping("/login")
     public ApiResponse login(
@@ -44,6 +48,7 @@ public class AuthController {
             HttpServletResponse response,
             @RequestBody AuthReqModel authReqModel
     ) {
+        log.info("AuthController - POST /login HTTP 메소드 실행");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authReqModel.getId(),
@@ -67,15 +72,14 @@ public class AuthController {
                 new Date(now.getTime() + refreshTokenExpiry)
         );
 
-        // userId refresh token 으로 DB 확인
-        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByUserId(userId);
+        // userId refresh token 으로 Redis 확인
+        String userRefreshToken = redisUtil.getData(userId);
         if (userRefreshToken == null) {
-            // 없는 경우 새로 등록
-            userRefreshToken = new UserRefreshToken(userId, refreshToken.getToken());
-            userRefreshTokenRepository.saveAndFlush(userRefreshToken);
+            //없는 경우 새로 등록
+            redisUtil.setDataExpire(userId, refreshToken.getToken(), refreshTokenExpiry);
         } else {
-            // DB에 refresh 토큰 업데이트
-            userRefreshToken.setRefreshToken(refreshToken.getToken());
+            //refresh 토큰 업데이트
+            redisUtil.setData(userId, refreshToken.getToken());
         }
 
         int cookieMaxAge = (int) refreshTokenExpiry / 60;
@@ -113,8 +117,9 @@ public class AuthController {
             return ApiResponse.invalidRefreshToken();
         }
 
-        // userId refresh token 으로 DB 확인
-        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByUserIdAndRefreshToken(userId, refreshToken);
+        // userId refresh token 으로 Redis 확인
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String userRefreshToken = vop.get(userId);
         if (userRefreshToken == null) {
             return ApiResponse.invalidRefreshToken();
         }
@@ -138,8 +143,8 @@ public class AuthController {
                     new Date(now.getTime() + refreshTokenExpiry)
             );
 
-            // DB에 refresh 토큰 업데이트
-            userRefreshToken.setRefreshToken(authRefreshToken.getToken());
+            //Redis에 refresh 토큰 업데이트
+            redisUtil.setDataExpire(userId, authRefreshToken.getToken(), refreshTokenExpiry);
 
             int cookieMaxAge = (int) refreshTokenExpiry / 60;
             CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);

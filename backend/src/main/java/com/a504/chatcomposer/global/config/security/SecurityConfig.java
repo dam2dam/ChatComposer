@@ -2,7 +2,7 @@ package com.a504.chatcomposer.global.config.security;
 
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.global.config.properties.CorsProperties;
-import com.a504.chatcomposer.user.repository.UserRefreshTokenRepository;
+import com.a504.chatcomposer.global.util.RedisUtil;
 import com.a504.chatcomposer.oauth.exception.RestAuthenticationEntryPoint;
 import com.a504.chatcomposer.oauth.filter.TokenAuthenticationFilter;
 import com.a504.chatcomposer.oauth.handler.OAuth2AuthenticationFailureHandler;
@@ -15,6 +15,7 @@ import com.a504.chatcomposer.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
@@ -47,7 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomUserDetailsService userDetailsService;
     private final CustomOAuth2UserService oAuth2UserService;
     private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
-    private final UserRefreshTokenRepository userRefreshTokenRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
 
     private static final String[] PERMIT_URL_ARRAY = {
             /* swagger v3 */
@@ -155,8 +157,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new OAuth2AuthenticationSuccessHandler(
                 tokenProvider,
                 appProperties,
-                userRefreshTokenRepository,
-                oAuth2AuthorizationRequestBasedOnCookieRepository()
+                oAuth2AuthorizationRequestBasedOnCookieRepository(),
+                redisTemplate,
+                redisUtil
         );
     }
 

@@ -2,8 +2,7 @@ package com.a504.chatcomposer.oauth.handler;
 
 import com.a504.chatcomposer.global.config.properties.AppProperties;
 import com.a504.chatcomposer.global.util.CookieUtil;
-import com.a504.chatcomposer.user.entity.UserRefreshToken;
-import com.a504.chatcomposer.user.repository.UserRefreshTokenRepository;
+import com.a504.chatcomposer.global.util.RedisUtil;
 import com.a504.chatcomposer.oauth.entity.ProviderType;
 import com.a504.chatcomposer.oauth.entity.RoleType;
 import com.a504.chatcomposer.oauth.info.OAuth2UserInfo;
@@ -12,6 +11,8 @@ import com.a504.chatcomposer.oauth.repository.OAuth2AuthorizationRequestBasedOnC
 import com.a504.chatcomposer.oauth.token.AuthToken;
 import com.a504.chatcomposer.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -39,8 +40,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final AuthTokenProvider tokenProvider;
     private final AppProperties appProperties;
-    private final UserRefreshTokenRepository userRefreshTokenRepository;
     private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -89,13 +91,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 new Date(now.getTime() + refreshTokenExpiry)
         );
 
-        // DB 저장
-        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByUserId(userInfo.getId());
-        if (userRefreshToken != null) {
-            userRefreshToken.setRefreshToken(refreshToken.getToken());
-        } else {
-            userRefreshToken = new UserRefreshToken(userInfo.getId(), refreshToken.getToken());
-            userRefreshTokenRepository.saveAndFlush(userRefreshToken);
+        // Redis에 refresh token 저장
+        ValueOperations<String, String> vop = redisTemplate.opsForValue();
+        String token = vop.get(userInfo.getId());
+        if (token != null) { //레디스에 저장되어있다면
+            //리프레쉬 토큰 갱신
+            logger.info("[Redis] 토큰이 이미 저장되어있습니다.");
+            redisUtil.setData(userInfo.getId(),refreshToken.getToken());
+        } else { //저장되어있지 않다면
+            //새로 레디스에 저장
+            logger.info("[Redis] 토큰을 새로 저장합니다. "+refreshTokenExpiry);
+            redisUtil.setDataExpire(userInfo.getId(),refreshToken.getToken(),refreshTokenExpiry);
         }
 
         int cookieMaxAge = (int) refreshTokenExpiry / 60;
