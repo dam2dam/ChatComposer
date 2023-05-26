@@ -6,6 +6,7 @@ import pydub
 import torch
 from diffusers import DiffusionPipeline, StableDiffusionImg2ImgPipeline, StableDiffusionPipeline
 from PIL import Image
+import numpy as np
 
 from riffusion.audio_splitter import AudioSplitter
 from riffusion.riffusion_pipeline import RiffusionPipeline
@@ -14,7 +15,7 @@ from riffusion.spectrogram_params import SpectrogramParams
 
 # TODO(hayk): Add URL params
 
-DEFAULT_CHECKPOINT = "riffusion/riffusion-model-v1"
+DEFAULT_CHECKPOINT = "home/ubuntu/ai_directory/training/riffusion-model"
 
 AUDIO_EXTENSIONS = ["mp3", "wav", "flac", "webm", "m4a", "ogg"]
 IMAGE_EXTENSIONS = ["png", "jpg", "jpeg"]
@@ -28,6 +29,55 @@ SCHEDULER_OPTIONS = [
     "EulerAncestralDiscreteScheduler",
 ]
 
+
+def run_img2img_magic_mix(
+    prompt: str,
+    init_image: Image.Image,
+    num_inference_steps: int,
+    guidance_scale: float,
+    seed: int,
+    kmin: float,
+    kmax: float,
+    mix_factor: float,
+    checkpoint: str = DEFAULT_CHECKPOINT,
+    device: str = "cuda",
+    scheduler: str = SCHEDULER_OPTIONS[0],
+):
+    """
+    Run the magic mix pipeline for img2img.
+    """
+    with pipeline_lock():
+        pipeline = load_magic_mix_pipeline(
+            checkpoint=checkpoint,
+            device=device,
+            scheduler=scheduler,
+        )
+
+        return pipeline(
+            init_image,
+            prompt=prompt,
+            kmin=kmin,
+            kmax=kmax,
+            mix_factor=mix_factor,
+            seed=seed,
+            guidance_scale=guidance_scale,
+            steps=num_inference_steps,
+        )
+
+def load_magic_mix_pipeline(
+    checkpoint: str = DEFAULT_CHECKPOINT,
+    device: str = "cuda",
+    scheduler: str = SCHEDULER_OPTIONS[0],
+):
+    pipeline = DiffusionPipeline.from_pretrained(
+        checkpoint,
+        custom_pipeline="magic_mix",
+    ).to(device)
+
+    pipeline.scheduler = get_scheduler(scheduler, pipeline.scheduler.config)
+
+    return pipeline
+    
 def run_img2img(
     prompt: str,
     init_image: Image.Image,
@@ -160,7 +210,7 @@ def audio_segment_from_spectrogram_image(
 
 
 def slice_audio_into_clips(
-    segment: pydub.AudioSegment, clip_start_times: T.Sequence[float], clip_duration_s: float
+    segment: pydub.AudioSegment, clip_start_times: T.Sequence[float], clip_duration_s: float, duration_s: float
 ) -> T.List[pydub.AudioSegment]:
     """
     Slice an audio segment into a list of clips of a given duration at the given start times.
@@ -169,13 +219,17 @@ def slice_audio_into_clips(
     for i, clip_start_time_s in enumerate(clip_start_times):
         clip_start_time_ms = int(clip_start_time_s * 1000)
         clip_duration_ms = int(clip_duration_s * 1000)
-        clip_segment = segment[clip_start_time_ms : clip_start_time_ms + clip_duration_ms]
+        duration_ms = int(duration_s * 1000)
+        print(clip_start_time_ms, clip_start_time_ms + clip_duration_ms, duration_ms)
+        if(clip_start_time_ms + clip_duration_ms > duration_ms):
+            clip_segment = segment[clip_start_time_ms : duration_ms]
+        else:
+            clip_segment = segment[clip_start_time_ms : clip_start_time_ms + clip_duration_ms]
 
-        # TODO(hayk): I don't think this is working properly
-        if i == len(clip_start_times) - 1:
-            silence_ms = clip_duration_ms - int(clip_segment.duration_seconds * 1000)
-            if silence_ms > 0:
-                clip_segment = clip_segment.append(pydub.AudioSegment.silent(duration=silence_ms))
+        if i == len(clip_start_times) - 1 and clip_segment.duration_seconds < clip_duration_s:
+            silence_duration = 0.5
+            silence_segment = pydub.AudioSegment.silent(duration=int(silence_duration * 1000))
+            clip_segment += silence_segment
 
         clip_segments.append(clip_segment)
 
@@ -197,3 +251,21 @@ def audio_segment_from_spectrogram_image(
 ) -> pydub.AudioSegment:
     converter = spectrogram_image_converter(params=params, device=device)
     return converter.audio_from_spectrogram_image(image)
+
+
+def get_clip_params(advanced: bool = False) -> T.Dict[str, T.Any]:
+    """
+    Render the parameters of slicing audio into clips.
+    """
+    p: T.Dict[str, T.Any] = {}
+
+
+    p["start_time_s"] = 0.0
+    
+    p["duration_s"] = 25.0
+
+    p["clip_duration_s"] = 7.0
+
+    p["overlap_duration_s"] = 0.4
+
+    return p

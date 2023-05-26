@@ -82,6 +82,7 @@ def stitch_segments(
     combined_segment = segments[0]
     for segment in segments[1:]:
         combined_segment = combined_segment.append(segment, crossfade=crossfade_ms)
+#         combined_segment = combined_segment.fade_out(crossfade_ms).overlay(segment.fade_in(crossfade_ms))
     return combined_segment
 
 

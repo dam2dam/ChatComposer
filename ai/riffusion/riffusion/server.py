@@ -9,6 +9,7 @@ import logging
 import time
 import typing as T
 from pathlib import Path
+import sys
 
 import dacite
 import flask
@@ -29,14 +30,35 @@ from riffusion.spectrogram_image_converter import SpectrogramImageConverter
 from riffusion.spectrogram_params import SpectrogramParams
 from riffusion.util import audio_util
 from riffusion.util import base64_util
+import json
+import base64
 
 # Flask app with CORS
 app = flask.Flask(__name__)
 CORS(app)
 
-# Log at the INFO level to both stdout and disk
-logging.basicConfig(level=logging.INFO)
-logging.getLogger().addHandler(logging.FileHandler("server.log"))
+# Create a logger and set the desired log level
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Create a file handler to write logs to the server.log file
+file_handler = logging.FileHandler("server.log")
+file_handler.setLevel(logging.INFO)
+
+# Create a stream handler to write logs to the standard output (stdout)
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setLevel(logging.INFO)
+
+# Create a formatter to specify the log message format
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+# Set the formatter for the handlers
+file_handler.setFormatter(formatter)
+stream_handler.setFormatter(formatter)
+
+# Add the handlers to the logger
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 # Global variable for the model pipeline
 PIPELINE: T.Optional[RiffusionPipeline] = None
@@ -47,11 +69,11 @@ SEED_IMAGES_DIR = Path(Path(__file__).resolve().parent.parent, "seed_images")
 
 def run_app(
     *,
-    checkpoint: str = "riffusion/riffusion-model-v1",
+    checkpoint="home/ubuntu/ai_directory/training/riffusion-modell",
     no_traced_unet: bool = False,
     device: str = "cuda",
-    host: str = "127.0.0.1",
-    port: int = 3013,
+    host: str = "0.0.0.0",
+    port: int = 3313,
     debug: bool = False,
     ssl_certificate: T.Optional[str] = None,
     ssl_key: T.Optional[str] = None,
@@ -61,14 +83,14 @@ def run_app(
     """
     # Initialize the model
     global PIPELINE
-    PIPELINE = RiffusionPipeline.load_checkpoint(
-        checkpoint=checkpoint,
-        use_traced_unet=not no_traced_unet,
-        device=device,
-    )
+#     PIPELINE = RiffusionPipeline.load_checkpoint(
+#         checkpoint=checkpoint,
+#         use_traced_unet=not no_traced_unet,
+#         device=device,
+#     )
 
     args = dict(
-        debug=debug,
+        debug=False,
         threaded=False,
         host=host,
         port=port,
@@ -81,7 +103,11 @@ def run_app(
     app.run(**args)  # type: ignore
 
 
-@app.route("/riff/", methods=["POST"])
+@app.route("/")
+def hello():
+    return "hello"
+
+@app.route("/riff", methods=["POST"])
 def riff():
     """
     1. download wav file from source [X]
@@ -110,17 +136,18 @@ def riff():
 
     response = compute_riff_request(
         inputs=inputs,
-        seed_images_dir=SEED_IMAGES_DIR,
         pipeline=PIPELINE,
     )
+
+    return response
 
 
 def compute_riff_request(
     inputs: RiffusionInput,
     pipeline: RiffusionPipeline,
 )-> str:
-    # input_wav = download_wav(inputs.url)
-    segment = download_local_wav()
+    segment = download_wav(inputs.musicSource)
+    logging.info("wav file downloaded!")
 
     # variables from audio_to_audio.py
     start_time_s = 0.0
@@ -128,9 +155,11 @@ def compute_riff_request(
     overlap_duration_s = 0.5
     batches = 1
 
-    duration_s = min(clip_duration_s, segment.duration_seconds - start_time_s)
-    increment_s = clip_duration_s - overlap_duration_s
-    clip_start_times = start_time_s + np.arange(0, duration_s - clip_duration_s, increment_s)    # spectorgram 
+    logging.info(segment.duration_seconds)
+    
+#     duration_s = min(clip_duration_s, segment.duration_seconds - start_time_s)
+#     increment_s = clip_duration_s - overlap_duration_s
+#     clip_start_times = start_time_s + np.arange(0, duration_s - clip_duration_s, increment_s)    # spectorgram 
 
     # prompt_input_a = PromptInput(
     #     prompt=prompt,
@@ -142,16 +171,41 @@ def compute_riff_request(
     prompt = inputs.prompt
     seed = randint(10, 100000)      
 
-    magic_mix_kmin = 0.6
+    magic_mix_kmin = 0.3
     magic_mix_kmax = 0.9
     magic_mix_mix_factor = 0.5
+    
+    clip_p = server_util.get_clip_params()
+    start_time_s = clip_p["start_time_s"]
+    clip_duration_s = clip_p["clip_duration_s"]
+    overlap_duration_s = clip_p["overlap_duration_s"]
 
+    duration_s = min(clip_p["duration_s"], segment.duration_seconds - start_time_s)
+    increment_s = clip_duration_s - overlap_duration_s
+    clip_start_times = start_time_s + np.arange(0, duration_s - clip_duration_s, increment_s)
+
+    # Add the last few seconds to the clip_start_times
+    last_clip_start_time = clip_start_times[-1] + increment_s
+    clip_start_times = np.append(clip_start_times, last_clip_start_time)
+    
+#     clip_p = server_util.get_clip_params()
+#     start_time_s = clip_p["start_time_s"] # 0
+#     clip_duration_s = clip_p["clip_duration_s"] # 5
+#     overlap_duration_s = clip_p["overlap_duration_s"] # 0
+
+#     duration_s = min(clip_p["duration_s"], segment.duration_seconds - start_time_s) # (20, 8 - 0) => 8
+#     increment_s = clip_duration_s - overlap_duration_s # 5 - 0
+#     clip_start_times = start_time_s + np.arange(0, duration_s - 3, increment_s) # (0, 5)
+    
+    print(clip_start_times)
+    
     clip_segments = server_util.slice_audio_into_clips(
         segment=segment,
         clip_start_times=clip_start_times,
         clip_duration_s=clip_duration_s,
+        duration_s = duration_s
     )
-
+    logging.info("wav file sliced!")
     params = SpectrogramParams(
         min_frequency=0,
         max_frequency=10000,
@@ -165,11 +219,12 @@ def compute_riff_request(
     scheduler="DPMSolverMultistepScheduler"
     device="cuda"
     # 모델 경로 잡아야 됨
-    checkpoint="riffusion-model"
+    checkpoint="../training/riffusion-model"
 
     result_images: T.List[Image.Image] = []
     result_segments: T.List[pydub.AudioSegment] = []
-
+    logging.info(f"number of clips : {len(clip_segments)}")
+    
     for i, clip_segment in enumerate(clip_segments):
         audio_bytes = io.BytesIO()
         clip_segment.export(audio_bytes, format="wav")
@@ -208,42 +263,29 @@ def compute_riff_request(
 
         audio_bytes = io.BytesIO()
         riffed_segment.export(audio_bytes, format="wav")
-
+    logging.info(f"created segments: {len(result_segments)}")
     # Combine clips with a crossfade based on overlap
-    combined_segment = audio_util.stitch_segments(result_segments, crossfade_s=overlap_duration_s)
-
+    combined_segment = audio_util.stitch_segments(result_segments, crossfade_s=0.0)
+    
     audio_bytes = io.BytesIO()
-    riffed_segment.export(audio_bytes, format="mp3")
+    combined_segment.export(audio_bytes, format="mp3")
     audio_bytes.seek(0)  # Move the file pointer to the beginning of the file
 
     # Assemble the output dataclass
-    output = InferenceOutput(
-        audio=audio_bytes
+    output = RiffusionOutput(
+        audio=base64_util.encode(audio_bytes)
     )
-
-    return json.dumps(dataclasses.asdict(output))
+    return base64_util.encode(audio_bytes)
 
 def download_wav(url: str):
     # fetch the file contents using the requests library
     response = requests.get(url)
-    audio_bytes = response.content
+    wav_data = response.content
 
-    # create a BytesIO buffer from the file contents
-    audio_buffer = io.BytesIO(audio_bytes)
+    # Convert the byte array to AudioSegment
+    audio_segment = pydub.AudioSegment.from_wav(io.BytesIO(wav_data))
 
-    # open the WAV file using the wave library
-    with wave.open(audio_buffer, 'rb') as wav_file:
-
-        # print some information about the WAV file
-        print(f'Number of channels: {wav_file.getnchannels()}')
-        print(f'Sample width: {wav_file.getsampwidth()}')
-        print(f'Frame rate: {wav_file.getframerate()}')
-        print(f'Number of frames: {wav_file.getnframes()}')
-
-        # read the WAV file data into a buffer
-        data = wav_file.readframes(wav_file.getnframes())
-
-    return data
+    return audio_segment
 
 def download_local_wav():
     # specify the path to the WAV file
@@ -369,5 +411,6 @@ def compute_request(
 
 if __name__ == "__main__":
     import argh
-
+    logging.info("riffusion started!")
+    sys.stdout.flush()
     argh.dispatch_command(run_app)

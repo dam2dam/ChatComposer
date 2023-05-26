@@ -5,9 +5,13 @@ import json
 import time
 import logging
 import sys
+import requests 
 
 # Configure the logging settings
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+MUSIC_SERVER = "http://222.107.238.124:8503"
+ALBUM_SERVER = "https://k8a504.store/album"
 
 app = Flask(__name__)
 
@@ -53,24 +57,27 @@ def process_message(method,props,message,ch):
     data['message'] = message.decode('utf8')
     logging.info(data)
     sys.stdout.flush()
-    data = json.dumps(data)
+    # data = json.dumps(data)
 
     # Your logic to process the message using the GPU server goes here
     if method.routing_key == "diffusion.key":
         logging.info("Diffusion message consumed!")
         sys.stdout.flush()
-        time.sleep(10)
+        response = requests.get(f"{ALBUM_SERVER}/api/generate?prompt={data['message']}", timeout=500)
+        album_data = response.content
         logging.info("publish response message")
-        ch.basic_publish(properties=pika.BasicProperties(correlation_id = props.correlation_id),  exchange='music.fanout', routing_key= props.reply_to, body=data)
+        ch.basic_publish(properties=pika.BasicProperties(correlation_id = props.correlation_id),  exchange='music.fanout', routing_key= props.reply_to, body=album_data)
         ch.basic_ack(delivery_tag = method.delivery_tag)
         # start_consuming()
     else:
         logging.info("Riffusion message consumed!")
         sys.stdout.flush()
         logging.info(message)
-        time.sleep(10)
+        # time.sleep(10)
+        response = requests.post(f"{MUSIC_SERVER}/riff", data = data['message'], timeout=500)
+        music_data = response.content
         logging.info("publish response message")
-        ch.basic_publish(properties=pika.BasicProperties(correlation_id = props.correlation_id),  exchange='music.fanout', routing_key= props.reply_to, body=data)
+        ch.basic_publish(properties=pika.BasicProperties(correlation_id = props.correlation_id),  exchange='music.fanout', routing_key= props.reply_to, body=music_data)
         ch.basic_ack(delivery_tag = method.delivery_tag)
         # start_consuming()
     
@@ -96,4 +103,4 @@ if __name__ == "__main__":
     print("start gateway")
     t = threading.Thread(target=start_consuming)
     t.start()
-    app.run(host="0.0.0.0", port=3000, debug=False)
+    app.run(host="0.0.0.0", port=8503, debug=False)
