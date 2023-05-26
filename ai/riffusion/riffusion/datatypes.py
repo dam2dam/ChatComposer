@@ -79,7 +79,7 @@ class RiffusionInput:
     """
 
     # wav file url stored S3 bucket made from midi
-    wav_url: str
+    musicSource: str
 
     # prompt made by gpt and user input
     prompt: str
